@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_main"
+    app:startDestination="@id/splash_fragment">
+
+    <fragment
+        android:id="@+id/splash_fragment"
+        android:name="com.miguelzaragozaserrano.dam.v2.presentation.ui.main.splash.SplashFragment"
+        android:label="SplashFragment"
+        tools:layout="@layout/fragment_splash" >
+        <action
+            android:id="@+id/action_splash_fragment_to_cameras_fragment"
+            app:destination="@id/cameras_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/cameras_fragment"
+        android:name="com.miguelzaragozaserrano.dam.v2.presentation.ui.main.cameras.CamerasFragment"
+        android:label="CamerasFragment"
+        tools:layout="@layout/fragment_cameras" />
+
+</navigation>

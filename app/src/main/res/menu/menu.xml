@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/search_icon"
+        android:icon="@drawable/ic_search"
+        android:title="@string/search_button"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/order_icon"
+        android:title="@string/order_button"
+        app:showAsAction="always|collapseActionView"
+        tools:ignore="AlwaysShowAction" />
+    <item
+        android:id="@+id/fav_icon"
+        android:icon="@drawable/ic_favorite_off"
+        android:title="@string/fav_button"
+        app:showAsAction="always|collapseActionView"
+        tools:ignore="AlwaysShowAction" />
+    <item
+        android:id="@+id/action_all"
+        android:checkable="true"
+        android:title="@string/action_multiple" />
+   <item
+        android:id="@+id/action_reset"
+        android:title="@string/action_reset"/>
+</menu>
