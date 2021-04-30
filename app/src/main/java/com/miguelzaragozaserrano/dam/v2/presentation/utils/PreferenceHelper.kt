@@ -2,10 +2,9 @@ package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.DATE
 
 object PreferenceHelper {
-
-    private const val DATE = "DATE"
 
     fun customPreference(context: Context, name: String): SharedPreferences =
         context.getSharedPreferences(name, Context.MODE_PRIVATE)

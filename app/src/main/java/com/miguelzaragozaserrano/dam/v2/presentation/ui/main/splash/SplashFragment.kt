@@ -14,14 +14,13 @@ import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.DATE
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.customPreference
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.date
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
 
 class SplashFragment : BaseFragment<FragmentSplashBinding>() {
-
-    private val DATE = "DATE"
 
     private val factory: ViewModelFactory by inject()
     private val viewModel: MainViewModel by navGraphViewModels(R.id.nav_main) {
