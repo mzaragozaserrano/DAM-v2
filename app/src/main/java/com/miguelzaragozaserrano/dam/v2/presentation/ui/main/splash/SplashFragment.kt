@@ -73,7 +73,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     override fun setup5InitFunctions() {
         super.setup5InitFunctions()
         initActions()
-        getLastDateSinceFileDownload()
     }
 
     private fun checkIfNextDay(cameras: List<CameraEntity>) {
@@ -106,10 +105,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     private fun initActions() {
         viewModel.onGoToCamerasFragment = ::onGoToCamerasFragment
         viewModel.onUpdateProgressBar = ::onUpdateProgressBar
-    }
-
-    private fun getLastDateSinceFileDownload() {
-
     }
 
     private fun onGoToCamerasFragment() {
