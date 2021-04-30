@@ -5,7 +5,6 @@ import android.view.*
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.setSupportActionBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -65,5 +64,12 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
         this.toolbar = toolbar
         this.menuId = menuId
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        toolbarItemSelected(itemSelected = item)
+        return true
+    }
+
+    open fun toolbarItemSelected(itemSelected: MenuItem) {}
 
 }
