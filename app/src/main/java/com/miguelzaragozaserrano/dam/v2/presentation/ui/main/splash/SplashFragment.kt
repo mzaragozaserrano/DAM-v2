@@ -15,8 +15,7 @@ import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.customPreference
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.dateToSave
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.dateToShow
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.date
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
 
@@ -41,8 +40,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                     checkIfNextDay(cameras)
                 } else {
                     if (viewModel.isFileDownloaded()) {
-                        prefs.dateToSave = LocalDateTime.now().toString()
-                        prefs.dateToShow = LocalDateTime.now().toStringDate()
+                        prefs.date = LocalDateTime.now().toDateString()
                         viewModel.setAllCameras(cameras)
                     }
                 }
@@ -80,7 +78,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     private fun checkIfNextDay(cameras: List<CameraEntity>) {
         if (Utils.isNextDay(
-                currentDay = LocalDateTime.now(), lastDay = prefs.dateToSave?.toDate()
+                currentDay = LocalDateTime.now(), lastDay = prefs.date?.toDate()
             ) == false
         ) {
             showMessage(cameras)
@@ -92,7 +90,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     private fun showMessage(cameras: List<CameraEntity>) {
         showDialogMessageComplete(
             title = "¿Deseas recargar los datos?",
-            message = "La última vez que se descargó el fichero fue el " + prefs.dateToShow,
+            message = "La última vez que se descargó el fichero fue el " + prefs.date?.toDate()?.toDateString(),
             positiveText = "Recargar",
             negativeText = "Cancelar",
             icon = null,

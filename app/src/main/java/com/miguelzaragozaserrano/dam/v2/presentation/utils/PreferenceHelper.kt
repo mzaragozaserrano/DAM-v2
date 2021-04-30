@@ -16,15 +16,7 @@ object PreferenceHelper {
         editMe.apply()
     }
 
-    var SharedPreferences.dateToShow
-        get() = getString(DATE, "")
-        set(value) {
-            editMe {
-                it.putString(DATE, value)
-            }
-        }
-
-    var SharedPreferences.dateToSave
+    var SharedPreferences.date
         get() = getString(DATE, "")
         set(value) {
             editMe {

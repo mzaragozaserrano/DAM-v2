@@ -33,7 +33,7 @@ fun CameraEntity.toCamera(): Camera {
     )
 }
 
-fun LocalDateTime.toStringDate(): String {
+fun LocalDateTime.toDateString(): String {
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
     return this.format(formatter)
 }
