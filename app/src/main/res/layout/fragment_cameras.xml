@@ -9,6 +9,13 @@
     android:orientation="vertical"
     android:background="@color/indigo_50">
 
+    <include
+        android:id="@+id/toolbar_component"
+        layout="@layout/toolbar_component"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cameras_list"
         android:layout_width="match_parent"

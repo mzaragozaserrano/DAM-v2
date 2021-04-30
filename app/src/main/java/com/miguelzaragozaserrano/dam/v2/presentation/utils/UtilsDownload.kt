@@ -6,7 +6,7 @@ import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import java.util.*
 
-object UtilsData {
+object UtilsDownload {
 
     var numberCameras: Int? = -1
     lateinit var onCameraDownload: ((camera: Camera) -> Unit)

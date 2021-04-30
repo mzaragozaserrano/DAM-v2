@@ -42,6 +42,11 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
         setCameraSelected(viewModel.getLastCameraSelected(), viewModel.getLastBindingItem())
     }
 
+    override fun setup5InitFunctions() {
+        super.setup5InitFunctions()
+        setupToolbar(binding.toolbarComponent?.toolbar, R.string.app_name, R.menu.menu)
+    }
+
     private fun setCameraSelected(lastCamera: Camera?, lastBindingItem: ListViewItemBinding?) {
         if (lastCamera != null) {
             adapter.setLastCameraSelected(camera = lastCamera)

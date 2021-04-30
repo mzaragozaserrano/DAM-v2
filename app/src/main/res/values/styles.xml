@@ -1,10 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DAMTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+
+    <style name="DAMTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/indigo_900</item>
         <item name="colorSecondary">@color/indigo_900_dark</item>
-        <item name="colorSurface">@color/indigo_100</item>
-        <item name="colorOnSurface">@color/white_50</item>
         <item name="android:statusBarColor">@color/indigo_900_dark</item>
+        <item name="alertDialogTheme">@style/DialogStyle</item>
     </style>
+
+    <style name="DAMTheme.Toolbar" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/white_50</item>
+        <item name="colorPrimary">@color/indigo_900</item>
+        <item name="colorSecondary">@color/indigo_900_dark</item>
+        <item name="colorSurface">@color/white_50</item>
+        <item name="colorOnSurface">@color/white_50</item>
+        <item name="android:fontFamily">@font/raleway</item>
+    </style>
+
+    <style name="TextViewCustom" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">@font/raleway</item>
+        <item name="android:textSize">@dimen/text_16</item>
+        <item name="maxLines">1</item>
+    </style>
+
+    <style name="DialogStyle" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="android:textAppearanceSmall">@style/MessageDialog</item>
+        <item name="android:textAppearanceMedium">@style/TitleDialog</item>
+        <item name="buttonBarButtonStyle">@style/Alert.Button</item>
+        <item name="android:windowTitleStyle">@style/DialogWindowTitle_Custom</item>
+    </style>
+
+    <style name="TitleDialog" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/raleway</item>
+        <item name="android:textSize">@dimen/text_20</item>
+    </style>
+
+    <style name="MessageDialog" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/raleway</item>
+    </style>
+
+    <style name="Alert.Button" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="backgroundTint">@color/white_50</item>
+        <item name="android:textColor">@color/indigo_900_dark</item>
+    </style>
+
+    <style name="DialogWindowTitle_Custom">
+        <item name="android:maxLines">1</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:textAppearance">@style/TextAppearance_DialogWindowTitle</item>
+    </style>
+
+    <style name="TextAppearance_DialogWindowTitle" parent="@android:style/TextAppearance.Holo.DialogWindowTitle">
+        <item name="android:fontFamily">@font/raleway</item>
+        <item name="android:textColor">@color/indigo_900_dark</item>
+    </style>
+
 </resources>

@@ -10,6 +10,7 @@
         app:showAsAction="always|collapseActionView" />
     <item
         android:id="@+id/order_icon"
+        android:icon="@drawable/ic_order"
         android:title="@string/order_button"
         app:showAsAction="always|collapseActionView"
         tools:ignore="AlwaysShowAction" />

@@ -7,4 +7,7 @@
     <dimen name="inner_frame_layout_padding">5dp</dimen>
     <dimen name="margin_8">8dp</dimen>
     <dimen name="margin_24">24dp</dimen>
+    <dimen name="text_12">12sp</dimen>
+    <dimen name="text_16">16sp</dimen>
+    <dimen name="text_20">20sp</dimen>
 </resources>

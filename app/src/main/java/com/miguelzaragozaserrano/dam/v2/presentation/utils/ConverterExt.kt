@@ -2,11 +2,9 @@ package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
 import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
 import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.*
 
 fun Camera.toCameraEntity(): CameraEntity {
     return CameraEntity(
@@ -35,7 +33,12 @@ fun CameraEntity.toCamera(): Camera {
     )
 }
 
-fun LocalDateTime.toDateWithoutTime(): String {
+fun LocalDateTime.toStringDate(): String {
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
     return this.format(formatter)
+}
+
+fun String.toDate(): LocalDateTime {
+    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+    return LocalDateTime.parse(this, formatter)
 }

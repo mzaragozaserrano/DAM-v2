@@ -1,7 +1,8 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseActivity
 
@@ -37,4 +38,10 @@ fun Fragment.showDialogMessageComplete(
         functionPositiveButton,
         functionNegativeButton
     )
+}
+
+fun Fragment.setSupportActionBar(toolbar: Toolbar? = null) {
+    (activity as AppCompatActivity).setSupportActionBar(toolbar)
+    (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+    setHasOptionsMenu(true)
 }

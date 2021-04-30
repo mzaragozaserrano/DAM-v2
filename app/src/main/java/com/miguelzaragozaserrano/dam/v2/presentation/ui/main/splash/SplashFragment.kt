@@ -15,10 +15,10 @@ import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.customPreference
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.date
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.dateToSave
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.dateToShow
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
-import java.util.*
 
 class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
@@ -38,22 +38,11 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                 viewModel.setRequest(false)
             } else {
                 if (viewModel.isNewRequest()) {
-                    showDialogMessageComplete(
-                        title = "¿Deseas recargar los datos?",
-                        message = "La última vez que se descargó el fichero fue el " + prefs.date,
-                        positiveText = "Recargar",
-                        negativeText = "Cancelar",
-                        icon = null,
-                        functionPositiveButton = {
-                            viewModel.getDataFromUrl()
-                            viewModel.setRequest(false)
-                        },
-                        functionNegativeButton = {
-                            viewModel.setAllCameras(cameras)
-                        })
+                    checkIfNextDay(cameras)
                 } else {
                     if (viewModel.isFileDownloaded()) {
-                        prefs.date = LocalDateTime.now().toDateWithoutTime()
+                        prefs.dateToSave = LocalDateTime.now().toString()
+                        prefs.dateToShow = LocalDateTime.now().toStringDate()
                         viewModel.setAllCameras(cameras)
                     }
                 }
@@ -89,6 +78,33 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         getLastDateSinceFileDownload()
     }
 
+    private fun checkIfNextDay(cameras: List<CameraEntity>) {
+        if (Utils.isNextDay(
+                currentDay = LocalDateTime.now(), lastDay = prefs.dateToSave?.toDate()
+            ) == false
+        ) {
+            showMessage(cameras)
+        } else {
+            viewModel.setAllCameras(cameras)
+        }
+    }
+
+    private fun showMessage(cameras: List<CameraEntity>) {
+        showDialogMessageComplete(
+            title = "¿Deseas recargar los datos?",
+            message = "La última vez que se descargó el fichero fue el " + prefs.dateToShow,
+            positiveText = "Recargar",
+            negativeText = "Cancelar",
+            icon = null,
+            functionPositiveButton = {
+                viewModel.getDataFromUrl()
+                viewModel.setRequest(false)
+            },
+            functionNegativeButton = {
+                viewModel.setAllCameras(cameras)
+            })
+    }
+
     private fun initActions() {
         viewModel.onGoToCamerasFragment = ::onGoToCamerasFragment
         viewModel.onUpdateProgressBar = ::onUpdateProgressBar
@@ -105,7 +121,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     private fun onUpdateProgressBar() {
         binding.bindProgressBar(
             camerasDownloaded = viewModel.getNumberCamerasDownloaded(),
-            totalCameras = UtilsData.numberCameras
+            totalCameras = UtilsDownload.numberCameras
         )
     }
 
