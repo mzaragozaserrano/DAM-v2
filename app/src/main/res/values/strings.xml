@@ -31,4 +31,8 @@
     <string name="with_cluster">Con Cluster</string>
     <string name="without_cluster">Sin Cluster</string>
     <string name="content_description">Description</string>
+    <string name="recharge_title">¿Deseas recargar los datos?</string>
+    <string name="recharge_message">\"La última vez que se descargó el fichero fue el \"</string>
+    <string name="recharge_button">Recargar</string>
+    <string name="cancel_button">Cancelar</string>
 </resources>

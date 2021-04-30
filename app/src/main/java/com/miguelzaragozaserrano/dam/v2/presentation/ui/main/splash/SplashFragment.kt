@@ -89,10 +89,10 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     private fun showMessage(cameras: List<CameraEntity>) {
         showDialogMessageComplete(
-            title = "¿Deseas recargar los datos?",
-            message = "La última vez que se descargó el fichero fue el " + prefs.date?.toDate()?.toDateString(),
-            positiveText = "Recargar",
-            negativeText = "Cancelar",
+            title = getString(R.string.recharge_title),
+            message = getString(R.string.recharge_message) + prefs.date?.toDate()?.toDateString(),
+            positiveText = getString(R.string.recharge_button),
+            negativeText = getString(R.string.cancel_button),
             icon = null,
             functionPositiveButton = {
                 viewModel.getDataFromUrl()
