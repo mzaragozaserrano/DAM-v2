@@ -77,7 +77,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     private fun checkIfNextDay(cameras: List<CameraEntity>) {
         if (Utils.isNextDay(
                 currentDay = LocalDateTime.now(), lastDay = prefs.date?.toDate()
-            ) == false
+            ) == true
         ) {
             showMessage(cameras)
         } else {
