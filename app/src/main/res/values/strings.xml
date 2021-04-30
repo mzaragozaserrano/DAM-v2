@@ -15,7 +15,6 @@
     <string name="action_reset">Resetear lista</string>
     <string name="loading_cameras">…cargando cámaras…</string>
     <string name="check_connection">Por favor, compruebe su conexión</string>
-    <string name="cancel_button">Cancelar</string>
     <string name="alert_cluster_title">¿Quieres activar el modo Cluster?</string>
     <string name="alert_cluster_message">Esta opción te permite agrupar un conjunto de marcadores cercanos representados como una agrupación, para facilitar la visualización de un mapa con muchos marcadores.</string>
     <string name="fav_button">Favoritas</string>
