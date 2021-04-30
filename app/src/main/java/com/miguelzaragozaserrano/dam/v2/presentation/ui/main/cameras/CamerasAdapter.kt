@@ -8,27 +8,31 @@ import androidx.recyclerview.widget.RecyclerView
 import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItemSelected
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItemUnselected
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindListViewItem
 import kotlin.properties.Delegates
 
 class CamerasAdapter(
-    cameras: List<Camera> = emptyList(),
     private val context: Context,
     private val onClickCamera: OnClickCameraListener
 ) : RecyclerView.Adapter<CamerasViewHolder>() {
 
+    private var order = NORMAL
+
     private var lastCameraSelected: Camera? = null
     private var lastBindingItem: ListViewItemBinding? = null
-    var cameras: List<Camera> by Delegates.observable(cameras) { _, _, _ -> notifyDataSetChanged() }
+    var currentList: List<Camera> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
+    private var normalList: List<Camera> = currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CamerasViewHolder {
         return CamerasViewHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: CamerasViewHolder, position: Int) {
-        val camera = cameras[position]
+        val camera = currentList[position]
         holder.itemView.apply {
             setOnClickListener {
                 if (camera != lastCameraSelected) {
@@ -52,7 +56,7 @@ class CamerasAdapter(
         holder.bindItem(camera, context)
     }
 
-    override fun getItemCount(): Int = cameras.size
+    override fun getItemCount(): Int = currentList.size
 
     fun setLastCameraSelected(camera: Camera?) {
         lastCameraSelected = camera
@@ -61,6 +65,29 @@ class CamerasAdapter(
     fun setLastBindingItem(binding: ListViewItemBinding?) {
         lastBindingItem = binding
     }
+
+    fun setOrder(order: Constants.ORDER) {
+        this.order = order
+        setList(order)
+    }
+
+    private fun setList(order: Constants.ORDER) {
+        currentList = when (order) {
+            ASCENDING -> {
+                currentList.sortedBy { camera ->
+                    camera.name
+                }
+            }
+            DESCENDING -> {
+                currentList.sortedByDescending { camera ->
+                    camera.name
+                }
+            }
+            NORMAL -> currentList
+        }
+    }
+
+    fun getOrder(): Constants.ORDER = order
 
 }
 

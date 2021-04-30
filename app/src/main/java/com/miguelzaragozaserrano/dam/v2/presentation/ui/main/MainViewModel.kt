@@ -12,6 +12,8 @@ import com.miguelzaragozaserrano.dam.v2.domain.models.DatabaseResponse
 import com.miguelzaragozaserrano.dam.v2.domain.models.Result
 import com.miguelzaragozaserrano.dam.v2.domain.repositories.interfaces.CameraRepository
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseViewModel
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.NORMAL
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.toCameraEntity
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.toListCamera
@@ -23,8 +25,10 @@ class MainViewModel(context: Context) : BaseViewModel() {
     private val repository by lazy { CameraRepository(database.cameraDao) }
 
     private var newRequest = true
-    private var allCameras = mutableListOf<Camera>()
     private var camerasDownloaded = 0
+    private var allCameras = mutableListOf<Camera>()
+
+    private var lastOrder: Constants.ORDER = NORMAL
     private var lastCameraSelected: Camera? = null
     private var lastBindingItem: ListViewItemBinding? = null
 
@@ -40,6 +44,8 @@ class MainViewModel(context: Context) : BaseViewModel() {
         }
     }
 
+    fun getLastOrder(): Constants.ORDER = lastOrder
+
     fun getAllCameras(): List<Camera> = allCameras
 
     fun getNumberCamerasDownloaded(): Int = camerasDownloaded
@@ -47,6 +53,10 @@ class MainViewModel(context: Context) : BaseViewModel() {
     fun getLastCameraSelected(): Camera? = lastCameraSelected
 
     fun getLastBindingItem(): ListViewItemBinding? = lastBindingItem
+
+    fun setLastOrder(order: Constants.ORDER) {
+        lastOrder = order
+    }
 
     fun setLastCameraSelected(camera: Camera) {
         lastCameraSelected = camera

@@ -21,10 +21,10 @@
         app:showAsAction="always|collapseActionView"
         tools:ignore="AlwaysShowAction" />
     <item
-        android:id="@+id/action_all"
+        android:id="@+id/show_all"
         android:checkable="true"
         android:title="@string/action_multiple" />
    <item
-        android:id="@+id/action_reset"
+        android:id="@+id/reset"
         android:title="@string/action_reset"/>
 </menu>
