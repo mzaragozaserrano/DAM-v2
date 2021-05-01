@@ -24,6 +24,19 @@
         <action
             android:id="@+id/action_cameras_fragment_to_splash_fragment"
             app:destination="@id/splash_fragment" />
+        <action
+            android:id="@+id/action_cameras_fragment_to_map_fragment"
+            app:destination="@id/map_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/map_fragment"
+        android:name="com.miguelzaragozaserrano.dam.v2.presentation.ui.main.map.MapFragment"
+        android:label="MapFragment"
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_map_fragment_to_cameras_fragment"
+            app:destination="@id/cameras_fragment" />
     </fragment>
 
 </navigation>

@@ -12,9 +12,13 @@ import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.*
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.ALL
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.FAVORITE
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.ViewModelFactory
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindAdapter
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindImageView
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindSearch
 import org.koin.android.ext.android.inject
 
 class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
@@ -40,6 +44,15 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
         container: ViewGroup
     ): FragmentCamerasBinding = FragmentCamerasBinding.inflate(inflater, container, false)
 
+    override fun setup2Listeners() {
+        super.setup2Listeners()
+        binding.cameraImage.apply {
+            setOnClickListener {
+                goToMapFragment()
+            }
+        }
+    }
+
     override fun setup4Vars() {
         super.setup4Vars()
         binding.apply {
@@ -49,7 +62,12 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
 
     override fun setup5InitFunctions() {
         super.setup5InitFunctions()
-        setupToolbar(binding.toolbarComponent.toolbar, R.string.app_name, R.menu.menu)
+        setupToolbar(
+            toolbar = binding.toolbarComponent.toolbar,
+            titleId = R.string.cameras_fragment_title,
+            menuId = R.menu.menu,
+            navigationIdIcon = null
+        )
     }
 
     override fun toolbarItemSelected(itemSelected: MenuItem, menu: Menu) {
@@ -106,6 +124,10 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
 
     private fun setCameraFavorite(camera: Camera, favorite: Boolean) {
         viewModel.setCameraFavorite(camera, favorite)
+    }
+
+    private fun goToMapFragment() {
+        findNavController().navigate(R.id.action_cameras_fragment_to_map_fragment)
     }
 
 }

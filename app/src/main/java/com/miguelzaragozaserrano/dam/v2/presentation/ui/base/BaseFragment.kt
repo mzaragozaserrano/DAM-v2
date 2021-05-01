@@ -2,6 +2,7 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.base
 
 import android.os.Bundle
 import android.view.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
@@ -16,6 +17,12 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
     private var menuId: Int = 0
     private var toolbar: Toolbar? = null
     private lateinit var menu: Menu
+
+    var callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            onBackPressedFun()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,11 +63,24 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
     open fun setup4Vars() {}
     open fun setup5InitFunctions() {}
 
-    fun setupToolbar(toolbar: Toolbar?, titleId: Int, menuId: Int) {
+    open fun onBackPressedFun() {}
+
+    fun setupToolbar(toolbar: Toolbar, titleId: Int, menuId: Int?, navigationIdIcon: Int?) {
         setSupportActionBar(toolbar)
-        toolbar?.title = getString(titleId)
+        with(toolbar) {
+            if (navigationIdIcon != null) {
+                setNavigationIcon(navigationIdIcon)
+                setNavigationOnClickListener {
+                    onBackPressedFun()
+                }
+            }
+        }
+
+        toolbar.title = getString(titleId)
         this.toolbar = toolbar
-        this.menuId = menuId
+        if (menuId != null) {
+            this.menuId = menuId
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
