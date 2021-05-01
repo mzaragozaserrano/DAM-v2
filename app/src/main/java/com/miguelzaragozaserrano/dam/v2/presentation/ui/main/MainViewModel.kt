@@ -23,7 +23,7 @@ class MainViewModel(context: Context) : BaseViewModel() {
     private val repository by lazy { CameraRepository(database.cameraDao) }
 
     var isFirstTime = true
-    var isResetRequest = false
+    var isRechargeRequest = false
     var allCameras = mutableListOf<Camera>()
 
     var lastOrder: Constants.ORDER = NORMAL

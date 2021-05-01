@@ -12,7 +12,7 @@
     <string name="search_button">Buscar</string>
     <string name="search_query_hint">Escribe el nombre de la cámara…</string>
     <string name="order_button">Ordenar</string>
-    <string name="action_reset">Resetear lista</string>
+    <string name="action_recharge">Recargar lista</string>
     <string name="loading_cameras">…cargando cámaras…</string>
     <string name="check_connection">Por favor, compruebe su conexión</string>
     <string name="alert_cluster_title">¿Quieres activar el modo Cluster?</string>

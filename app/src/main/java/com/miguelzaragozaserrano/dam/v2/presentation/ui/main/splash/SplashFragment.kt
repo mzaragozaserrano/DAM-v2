@@ -2,7 +2,6 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.splash
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,7 +33,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     private val dbListCamerasObserver: Observer<List<CameraEntity>> by lazy {
         Observer { cameras ->
-            if (cameras.isEmpty() || viewModel.isResetRequest) {
+            if (cameras.isEmpty() || viewModel.isRechargeRequest) {
                 getDataFromUrl()
             } else {
                 if (viewModel.isFirstTime) {
@@ -43,7 +42,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                     if (viewModel.isFileDownloaded()) {
                         prefs.date = LocalDateTime.now().toDateString()
                         goToCamerasFragment(cameras)
-                    }else{
+                    } else {
                         binding.bindProgressBar(
                             camerasDownloaded = cameras.size,
                             totalCameras = numberCameras
@@ -109,8 +108,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     }
 
     private fun getDataFromUrl() {
-        if (viewModel.isResetRequest) {
-            viewModel.isResetRequest = false
+        if (viewModel.isRechargeRequest) {
+            viewModel.isRechargeRequest = false
             viewModel.clearDatabase()
         } else {
             viewModel.isFirstTime = false

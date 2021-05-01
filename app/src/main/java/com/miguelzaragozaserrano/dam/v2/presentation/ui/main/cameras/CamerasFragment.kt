@@ -73,8 +73,8 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             R.id.show_all -> {
                 itemSelected.isChecked = !itemSelected.isChecked
             }
-            R.id.reset -> {
-                viewModel.isResetRequest = true
+            R.id.recharge -> {
+                viewModel.isRechargeRequest = true
                 findNavController().navigate(R.id.action_cameras_fragment_to_splash_fragment)
             }
             R.id.search_icon -> {

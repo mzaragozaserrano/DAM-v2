@@ -25,6 +25,6 @@
         android:checkable="true"
         android:title="@string/action_multiple" />
    <item
-        android:id="@+id/reset"
-        android:title="@string/action_reset"/>
+        android:id="@+id/recharge"
+        android:title="@string/action_recharge"/>
 </menu>
