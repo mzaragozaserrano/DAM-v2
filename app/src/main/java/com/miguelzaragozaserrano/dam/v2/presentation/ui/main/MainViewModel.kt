@@ -1,22 +1,20 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.ui.main
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.db.CameraDb
 import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
 import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
-import com.miguelzaragozaserrano.dam.v2.domain.models.DatabaseResponse
-import com.miguelzaragozaserrano.dam.v2.domain.models.Result
 import com.miguelzaragozaserrano.dam.v2.domain.repositories.interfaces.CameraRepository
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.NORMAL
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.downloadFile
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.numberCameras
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.onCameraDownload
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.toCameraEntity
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.toListCamera
 import kotlinx.coroutines.launch
 
 class MainViewModel(context: Context) : BaseViewModel() {
@@ -24,69 +22,32 @@ class MainViewModel(context: Context) : BaseViewModel() {
     private val database by lazy { CameraDb.getInstance(context) }
     private val repository by lazy { CameraRepository(database.cameraDao) }
 
-    private var newRequest = true
-    private var camerasDownloaded = 0
-    private var allCameras = mutableListOf<Camera>()
+    var isFirstTime = true
+    var isResetRequest = false
+    var allCameras = mutableListOf<Camera>()
 
-    private var lastOrder: Constants.ORDER = NORMAL
-    private var lastCameraSelected: Camera? = null
-    private var lastBindingItem: ListViewItemBinding? = null
+    var lastOrder: Constants.ORDER = NORMAL
+    var lastCameraSelected: Camera? = null
+    var lastBindingItem: ListViewItemBinding? = null
 
-    var camerasLiveData: LiveData<List<CameraEntity>> = repository.getAllCameras()
+    var dbListCameras: LiveData<List<CameraEntity>> = repository.getAllCameras()
 
-    lateinit var onGoToCamerasFragment: () -> Unit
-    lateinit var onUpdateProgressBar: () -> Unit
+    fun isFileDownloaded(): Boolean =
+        dbListCameras.value?.size == (numberCameras?.minus(1))
+
+    fun clearDatabase() = viewModelScope.launch {
+        repository.clearDatabase()
+    }
 
     fun getDataFromUrl() {
-        UtilsDownload.downloadFile()
-        UtilsDownload.onCameraDownload = { camera ->
+        downloadFile()
+        onCameraDownload = { camera ->
             insert(camera = camera)
         }
     }
 
-    fun getLastOrder(): Constants.ORDER = lastOrder
-
-    fun getAllCameras(): List<Camera> = allCameras
-
-    fun getNumberCamerasDownloaded(): Int = camerasDownloaded
-
-    fun getLastCameraSelected(): Camera? = lastCameraSelected
-
-    fun getLastBindingItem(): ListViewItemBinding? = lastBindingItem
-
-    fun setLastOrder(order: Constants.ORDER) {
-        lastOrder = order
-    }
-
-    fun setLastCameraSelected(camera: Camera) {
-        lastCameraSelected = camera
-    }
-
-    fun setLastBindingItem(binding: ListViewItemBinding?) {
-        lastBindingItem = binding
-    }
-
-    fun setAllCameras(cameras: List<CameraEntity>) {
-        allCameras.addAll(cameras.toListCamera())
-        onGoToCamerasFragment.invoke()
-    }
-
-    fun isNewRequest(): Boolean = newRequest
-
-    fun setRequest(status: Boolean) {
-        newRequest = status
-    }
-
-    fun isFileDownloaded(): Boolean = camerasDownloaded == (UtilsDownload.numberCameras?.minus(1))
-
     private fun insert(camera: Camera) = viewModelScope.launch {
-        when (repository.insert(camera = camera.toCameraEntity())) {
-            is Result.Success<DatabaseResponse> -> {
-                camerasDownloaded++
-                onUpdateProgressBar.invoke()
-            }
-            else -> Log.d("hola", "error")
-        }
+        repository.insert(camera = camera.toCameraEntity())
     }
 
 }

@@ -2,6 +2,7 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.splash
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,8 @@ import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.DATE
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.customPreference
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.date
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.isNextDay
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.numberCameras
 import org.koin.android.ext.android.inject
 import java.time.LocalDateTime
 
@@ -29,18 +32,22 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     private lateinit var prefs: SharedPreferences
 
-    private val camerasObserver: Observer<List<CameraEntity>> by lazy {
+    private val dbListCamerasObserver: Observer<List<CameraEntity>> by lazy {
         Observer { cameras ->
-            if (cameras.isEmpty()) {
-                viewModel.getDataFromUrl()
-                viewModel.setRequest(false)
+            if (cameras.isEmpty() || viewModel.isResetRequest) {
+                getDataFromUrl()
             } else {
-                if (viewModel.isNewRequest()) {
+                if (viewModel.isFirstTime) {
                     checkIfNextDay(cameras)
                 } else {
                     if (viewModel.isFileDownloaded()) {
                         prefs.date = LocalDateTime.now().toDateString()
-                        viewModel.setAllCameras(cameras)
+                        goToCamerasFragment(cameras)
+                    }else{
+                        binding.bindProgressBar(
+                            camerasDownloaded = cameras.size,
+                            totalCameras = numberCameras
+                        )
                     }
                 }
             }
@@ -59,8 +66,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     override fun setup1Observers() {
         super.setup1Observers()
-        if (!viewModel.camerasLiveData.hasObservers()) {
-            viewModel.camerasLiveData.observe(viewLifecycleOwner, camerasObserver)
+        if (!viewModel.dbListCameras.hasObservers()) {
+            viewModel.dbListCameras.observe(viewLifecycleOwner, dbListCamerasObserver)
         }
     }
 
@@ -69,19 +76,14 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         binding.bindProgressCircle()
     }
 
-    override fun setup5InitFunctions() {
-        super.setup5InitFunctions()
-        initActions()
-    }
-
     private fun checkIfNextDay(cameras: List<CameraEntity>) {
-        if (Utils.isNextDay(
+        if (isNextDay(
                 currentDay = LocalDateTime.now(), lastDay = prefs.date?.toDate()
             ) == true
         ) {
             showMessage(cameras)
         } else {
-            viewModel.setAllCameras(cameras)
+            goToCamerasFragment(cameras)
         }
     }
 
@@ -93,28 +95,27 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             negativeText = getString(R.string.cancel_button),
             icon = null,
             functionPositiveButton = {
-                viewModel.getDataFromUrl()
-                viewModel.setRequest(false)
+                getDataFromUrl()
             },
             functionNegativeButton = {
-                viewModel.setAllCameras(cameras)
+                goToCamerasFragment(cameras)
             })
     }
 
-    private fun initActions() {
-        viewModel.onGoToCamerasFragment = ::onGoToCamerasFragment
-        viewModel.onUpdateProgressBar = ::onUpdateProgressBar
-    }
-
-    private fun onGoToCamerasFragment() {
+    private fun goToCamerasFragment(cameras: List<CameraEntity>) {
+        viewModel.allCameras.clear()
+        viewModel.allCameras.addAll(cameras.toListCamera())
         findNavController().navigate(R.id.action_splash_fragment_to_cameras_fragment)
     }
 
-    private fun onUpdateProgressBar() {
-        binding.bindProgressBar(
-            camerasDownloaded = viewModel.getNumberCamerasDownloaded(),
-            totalCameras = UtilsDownload.numberCameras
-        )
+    private fun getDataFromUrl() {
+        if (viewModel.isResetRequest) {
+            viewModel.isResetRequest = false
+            viewModel.clearDatabase()
+        } else {
+            viewModel.isFirstTime = false
+            viewModel.getDataFromUrl()
+        }
     }
 
 }

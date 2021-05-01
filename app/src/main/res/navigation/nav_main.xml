@@ -20,6 +20,10 @@
         android:id="@+id/cameras_fragment"
         android:name="com.miguelzaragozaserrano.dam.v2.presentation.ui.main.cameras.CamerasFragment"
         android:label="CamerasFragment"
-        tools:layout="@layout/fragment_cameras" />
+        tools:layout="@layout/fragment_cameras" >
+        <action
+            android:id="@+id/action_cameras_fragment_to_splash_fragment"
+            app:destination="@id/splash_fragment" />
+    </fragment>
 
 </navigation>
