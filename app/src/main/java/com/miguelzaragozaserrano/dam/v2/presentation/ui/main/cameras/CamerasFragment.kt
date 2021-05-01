@@ -1,8 +1,10 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.cameras
 
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentCamerasBinding
@@ -12,7 +14,9 @@ import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.ViewModelFactory
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindAdapter
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindImageView
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindSearch
 import org.koin.android.ext.android.inject
 
 class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
@@ -38,49 +42,51 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
     override fun setup4Vars() {
         super.setup4Vars()
         binding.apply {
-            adapter.currentList = viewModel.getAllCameras()
-            adapter.setOrder(viewModel.getLastOrder())
-            camerasList.adapter = adapter
+            bindAdapter(viewModel, camerasList, adapter)
         }
-        setCameraSelected(viewModel.getLastCameraSelected(), viewModel.getLastBindingItem())
     }
 
     override fun setup5InitFunctions() {
         super.setup5InitFunctions()
-        setupToolbar(binding.toolbarComponent?.toolbar, R.string.app_name, R.menu.menu)
+        setupToolbar(binding.toolbarComponent.toolbar, R.string.app_name, R.menu.menu)
     }
 
-    override fun toolbarItemSelected(itemSelected: MenuItem) {
-        super.toolbarItemSelected(itemSelected)
+    override fun toolbarItemSelected(itemSelected: MenuItem, menu: Menu) {
+        super.toolbarItemSelected(itemSelected, menu)
         when (itemSelected.itemId) {
             R.id.order_icon -> {
-                when (adapter.getOrder()) {
+                when (adapter.order) {
                     NORMAL -> {
-                        adapter.setOrder(ASCENDING)
-                        viewModel.setLastOrder(ASCENDING)
+                        adapter.setOrderList(ASCENDING)
+                        viewModel.lastOrder = ASCENDING
                     }
                     ASCENDING -> {
-                        adapter.setOrder(DESCENDING)
-                        viewModel.setLastOrder(DESCENDING)
+                        adapter.setOrderList(DESCENDING)
+                        viewModel.lastOrder = DESCENDING
                     }
                     DESCENDING -> {
-                        adapter.setOrder(ASCENDING)
-                        viewModel.setLastOrder(ASCENDING)
+                        adapter.setOrderList(ASCENDING)
+                        viewModel.lastOrder = ASCENDING
                     }
                 }
             }
             R.id.show_all -> {
                 itemSelected.isChecked = !itemSelected.isChecked
             }
+            R.id.reset -> {
+                viewModel.isResetRequest = true
+                findNavController().navigate(R.id.action_cameras_fragment_to_splash_fragment)
+            }
+            R.id.search_icon -> {
+                itemSelected.bindSearch(menu, adapter, requireContext())
+            }
         }
     }
 
     private fun setCameraSelected(lastCamera: Camera?, lastBindingItem: ListViewItemBinding?) {
-        if (lastCamera != null) {
-            adapter.setLastCameraSelected(camera = lastCamera)
-            adapter.setLastBindingItem(binding = lastBindingItem)
-            viewModel.setLastCameraSelected(camera = lastCamera)
-            viewModel.setLastBindingItem(binding = lastBindingItem)
+        if (lastCamera != null && lastBindingItem != null) {
+            viewModel.lastCameraSelected = lastCamera
+            viewModel.lastBindingItem = lastBindingItem
             binding.bindImageView(imgUrl = lastCamera.url)
         }
     }

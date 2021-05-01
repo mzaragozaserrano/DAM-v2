@@ -15,7 +15,6 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
 
     private var menuId: Int = 0
     private var toolbar: Toolbar? = null
-    private var functionOnCreateOptionsMenu: (() -> Unit)? = null
     private lateinit var menu: Menu
 
     override fun onCreateView(
@@ -39,7 +38,6 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
             inflater.inflate(menuId, menu)
         }
         this.menu = menu
-        functionOnCreateOptionsMenu?.invoke()
     }
 
     abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup): VB
@@ -66,10 +64,10 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        toolbarItemSelected(itemSelected = item)
+        toolbarItemSelected(itemSelected = item, menu = menu)
         return true
     }
 
-    open fun toolbarItemSelected(itemSelected: MenuItem) {}
+    open fun toolbarItemSelected(itemSelected: MenuItem, menu: Menu) {}
 
 }

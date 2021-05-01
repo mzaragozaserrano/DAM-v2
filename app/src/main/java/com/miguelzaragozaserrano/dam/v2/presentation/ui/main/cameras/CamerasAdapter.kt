@@ -13,6 +13,7 @@ import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItemSelected
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItemUnselected
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindListViewItem
+import java.util.*
 import kotlin.properties.Delegates
 
 class CamerasAdapter(
@@ -20,12 +21,11 @@ class CamerasAdapter(
     private val onClickCamera: OnClickCameraListener
 ) : RecyclerView.Adapter<CamerasViewHolder>() {
 
-    private var order = NORMAL
-
-    private var lastCameraSelected: Camera? = null
-    private var lastBindingItem: ListViewItemBinding? = null
+    var order = NORMAL
+    var lastCameraSelected: Camera? = null
+    var lastBindingItem: ListViewItemBinding? = null
+    var normalList: List<Camera> = emptyList()
     var currentList: List<Camera> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
-    private var normalList: List<Camera> = currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CamerasViewHolder {
         return CamerasViewHolder.from(parent)
@@ -49,7 +49,7 @@ class CamerasAdapter(
                             camera = camera
                         )
                     onClickCamera.onClick(camera, lastBindingItem)
-                    notifyDataSetChanged()
+                    lastCameraSelected = camera
                 }
             }
         }
@@ -58,20 +58,8 @@ class CamerasAdapter(
 
     override fun getItemCount(): Int = currentList.size
 
-    fun setLastCameraSelected(camera: Camera?) {
-        lastCameraSelected = camera
-    }
-
-    fun setLastBindingItem(binding: ListViewItemBinding?) {
-        lastBindingItem = binding
-    }
-
-    fun setOrder(order: Constants.ORDER) {
+    fun setOrderList(order: Constants.ORDER) {
         this.order = order
-        setList(order)
-    }
-
-    private fun setList(order: Constants.ORDER) {
         currentList = when (order) {
             ASCENDING -> {
                 currentList.sortedBy { camera ->
@@ -83,11 +71,25 @@ class CamerasAdapter(
                     camera.name
                 }
             }
-            NORMAL -> currentList
+            NORMAL -> normalList
         }
     }
 
-    fun getOrder(): Constants.ORDER = order
+    fun setFilterList(query: String?) {
+        query?.let {
+            if(query != "") {
+                currentList = currentList.filter { camera ->
+                    camera.name.toLowerCase(Locale.getDefault())
+                        .contains(
+                            query.toLowerCase(Locale.getDefault())
+                        )
+                }
+            }else{
+                currentList = normalList
+                setOrderList(order)
+            }
+        }
+    }
 
 }
 
