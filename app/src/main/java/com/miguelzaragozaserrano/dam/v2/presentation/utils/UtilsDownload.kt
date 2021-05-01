@@ -37,6 +37,7 @@ object UtilsDownload {
                                     id = UUID.randomUUID().toString(),
                                     name = nameAux.substringAfter("<Value>")
                                         .substringBefore("</Value>"),
+                                    favorite = false,
                                     url = data.substringAfter("src=").substringBefore("  width"),
                                     longitude = longitude,
                                     latitude = latitude,

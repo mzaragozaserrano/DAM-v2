@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class Camera(
     var id: String,
     var name: String,
+    var favorite: Boolean,
     var url: String,
     var latitude: String,
     var longitude: String,

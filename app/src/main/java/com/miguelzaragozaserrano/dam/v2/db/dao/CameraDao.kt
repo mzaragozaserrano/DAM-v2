@@ -26,5 +26,8 @@ interface CameraDao {
     @Query("SELECT * FROM camera_table")
     fun getAllCameras(): LiveData<List<CameraEntity>>
 
+    @Query("UPDATE camera_table SET favorite = :favorite WHERE id = :id")
+    suspend fun updateFavorite(id: String, favorite: Boolean)
+
 }
 

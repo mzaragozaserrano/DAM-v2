@@ -10,18 +10,22 @@ import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItemSelected
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItemUnselected
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.ALL
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.FAVORITE
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItem
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindFavButton
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindListViewItem
 import java.util.*
 import kotlin.properties.Delegates
 
 class CamerasAdapter(
     private val context: Context,
-    private val onClickCamera: OnClickCameraListener
+    private val onItemClicked: OnClickItemListView,
+    private val onFavButtonClicked: OnClickItemListView
 ) : RecyclerView.Adapter<CamerasViewHolder>() {
 
     var order = NORMAL
+    var type = ALL
     var lastCameraSelected: Camera? = null
     var lastBindingItem: ListViewItemBinding? = null
     var normalList: List<Camera> = emptyList()
@@ -36,11 +40,15 @@ class CamerasAdapter(
         holder.itemView.apply {
             setOnClickListener {
                 if (camera != lastCameraSelected) {
-                    lastBindingItem?.bindBackgroundItemUnselected(
-                        lastCameraSelected,
-                        getDrawable(
+                    lastBindingItem?.bindBackgroundItem(
+                        camera = lastCameraSelected,
+                        border = getDrawable(
                             context,
                             R.drawable.border
+                        ),
+                        borderSelected = getDrawable(
+                            context,
+                            R.drawable.border_selected
                         )
                     )
                     lastBindingItem =
@@ -48,46 +56,75 @@ class CamerasAdapter(
                             context = context,
                             camera = camera
                         )
-                    onClickCamera.onClick(camera, lastBindingItem)
+                    onItemClicked.onClick(camera, lastBindingItem, camera.favorite)
                     lastCameraSelected = camera
+                    notifyDataSetChanged()
                 }
             }
         }
-        holder.bindItem(camera, context)
+        holder.bindItem(camera, context, onFavButtonClicked)
     }
 
     override fun getItemCount(): Int = currentList.size
 
-    fun setOrderList(order: Constants.ORDER) {
+    fun setListByOrder(order: Constants.ORDER) {
         this.order = order
-        currentList = when (order) {
-            ASCENDING -> {
-                currentList.sortedBy { camera ->
-                    camera.name
-                }
-            }
-            DESCENDING -> {
-                currentList.sortedByDescending { camera ->
-                    camera.name
-                }
-            }
-            NORMAL -> normalList
-        }
+        setList()
     }
 
-    fun setFilterList(query: String?) {
+    fun setListByName(query: String?) {
         query?.let {
-            if(query != "") {
+            if (query != "") {
                 currentList = currentList.filter { camera ->
                     camera.name.toLowerCase(Locale.getDefault())
                         .contains(
                             query.toLowerCase(Locale.getDefault())
                         )
                 }
-            }else{
+            } else {
                 currentList = normalList
-                setOrderList(order)
+                setListByOrder(order)
             }
+        }
+    }
+
+    fun setListByType(type: Constants.TYPE) {
+        this.type = type
+        setList()
+    }
+
+    private fun setList() {
+        currentList = when {
+            type == ALL && order == ASCENDING -> {
+                normalList.sortedBy { camera ->
+                    camera.name
+                }
+            }
+            type == ALL && order == DESCENDING -> {
+                normalList.sortedByDescending { camera ->
+                    camera.name
+                }
+            }
+            type == FAVORITE && order == NORMAL -> {
+                normalList.filter { camera ->
+                    camera.favorite
+                }
+            }
+            type == FAVORITE && order == ASCENDING -> {
+                normalList.sortedBy { camera ->
+                    camera.name
+                }.filter { camera ->
+                    camera.favorite
+                }
+            }
+            type == FAVORITE && order == DESCENDING -> {
+                normalList.sortedByDescending { camera ->
+                    camera.name
+                }.filter { camera ->
+                    camera.favorite
+                }
+            }
+            else -> normalList
         }
     }
 
@@ -96,25 +133,43 @@ class CamerasAdapter(
 class CamerasViewHolder private constructor(private val binding: ListViewItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bindItem(camera: Camera, context: Context) =
+    fun bindItem(camera: Camera, context: Context, onFavButtonClicked: OnClickItemListView) =
         with(binding) {
             bindListViewItem(
                 name = camera.name,
                 selected = camera.selected,
+                favorite = camera.favorite,
                 border = getDrawable(context, R.drawable.border),
                 borderSelected = getDrawable(context, R.drawable.border_selected),
-                favIcon = getDrawable(context, R.drawable.ic_favorite_deselected)
+                favIcon = getDrawable(context, R.drawable.ic_favorite),
+                favIconSelected = getDrawable(context, R.drawable.ic_favorite_selected)
             )
+            favButton.apply {
+                setOnClickListener {
+                    bindFavButton(
+                        camera = camera, favIcon = getDrawable(context, R.drawable.ic_favorite),
+                        favIconSelected = getDrawable(context, R.drawable.ic_favorite_selected)
+                    )
+                    onFavButtonClicked.onClick(camera, null, camera.favorite)
+                }
+            }
         }
 
     fun bindSelectedCamera(
         context: Context,
         camera: Camera?
-    ): ListViewItemBinding {
+    ): ListViewItemBinding? {
         with(binding) {
-            return bindBackgroundItemSelected(
+            return bindBackgroundItem(
                 camera = camera,
-                drawable = getDrawable(context, R.drawable.border_selected)
+                border = getDrawable(
+                    context,
+                    R.drawable.border
+                ),
+                borderSelected = getDrawable(
+                    context,
+                    R.drawable.border_selected
+                )
             )
         }
     }
@@ -130,7 +185,7 @@ class CamerasViewHolder private constructor(private val binding: ListViewItemBin
 
 }
 
-class OnClickCameraListener(val clickListener: (camera: Camera, lastBindingItem: ListViewItemBinding?) -> Unit) {
-    fun onClick(camera: Camera, lastBindingItem: ListViewItemBinding?) =
-        clickListener(camera, lastBindingItem)
+class OnClickItemListView(val clickListener: (camera: Camera, lastBindingItem: ListViewItemBinding?, isFavorite: Boolean) -> Unit) {
+    fun onClick(camera: Camera, lastBindingItem: ListViewItemBinding?, isFavorite: Boolean) =
+        clickListener(camera, lastBindingItem, isFavorite)
 }

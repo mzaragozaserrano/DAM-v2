@@ -10,7 +10,8 @@ import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
 import com.miguelzaragozaserrano.dam.v2.domain.repositories.interfaces.CameraRepository
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.NORMAL
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.downloadFile
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.numberCameras
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.onCameraDownload
@@ -27,6 +28,7 @@ class MainViewModel(context: Context) : BaseViewModel() {
     var allCameras = mutableListOf<Camera>()
 
     var lastOrder: Constants.ORDER = NORMAL
+    var lastType: Constants.TYPE = ALL
     var lastCameraSelected: Camera? = null
     var lastBindingItem: ListViewItemBinding? = null
 
@@ -44,6 +46,10 @@ class MainViewModel(context: Context) : BaseViewModel() {
         onCameraDownload = { camera ->
             insert(camera = camera)
         }
+    }
+
+    fun setCameraFavorite(camera: Camera, favorite: Boolean) = viewModelScope.launch {
+        repository.updateFavorite(camera.id, favorite)
     }
 
     private fun insert(camera: Camera) = viewModelScope.launch {

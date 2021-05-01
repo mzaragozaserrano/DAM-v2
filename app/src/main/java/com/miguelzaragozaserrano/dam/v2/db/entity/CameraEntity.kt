@@ -11,6 +11,8 @@ class CameraEntity(
     val id: String,
     @ColumnInfo(name = "name")
     val name: String,
+    @ColumnInfo(name = "favorite")
+    val favorite: Boolean,
     @ColumnInfo(name = "url")
     val url: String,
     @ColumnInfo(name = "latitude")

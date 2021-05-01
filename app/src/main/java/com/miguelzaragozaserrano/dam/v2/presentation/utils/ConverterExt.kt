@@ -11,6 +11,7 @@ fun Camera.toCameraEntity(): CameraEntity {
         id = id,
         name = name,
         url = url,
+        favorite = favorite,
         latitude = latitude,
         longitude = longitude
     )
@@ -27,6 +28,7 @@ fun CameraEntity.toCamera(): Camera {
         id = this.id,
         name = this.name,
         url = this.url,
+        favorite = this.favorite,
         latitude = this.latitude,
         longitude = this.longitude,
         selected = false

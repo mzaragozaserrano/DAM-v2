@@ -15,6 +15,9 @@ class CameraRepository(private val cameraDao: CameraDao) {
 
     suspend fun clearDatabase() = cameraDao.clearDatabase()
 
+    suspend fun updateFavorite(id: String, favorite: Boolean) =
+        cameraDao.updateFavorite(id, favorite)
+
     fun getAllCameras(): LiveData<List<CameraEntity>> = cameraDao.getAllCameras()
 
 }

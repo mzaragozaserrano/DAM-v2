@@ -5,4 +5,5 @@ object Constants {
     const val DATE = "DATE"
 
     enum class ORDER { NORMAL, ASCENDING, DESCENDING }
+    enum class TYPE { ALL, FAVORITE }
 }

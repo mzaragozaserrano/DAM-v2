@@ -43,7 +43,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@drawable/ic_favorite_deselected" />
+            tools:srcCompat="@drawable/ic_favorite" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

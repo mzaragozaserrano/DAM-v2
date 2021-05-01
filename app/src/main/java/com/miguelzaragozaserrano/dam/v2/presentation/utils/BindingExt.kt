@@ -23,16 +23,36 @@ import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.setItemsVisibil
 fun ListViewItemBinding.bindListViewItem(
     name: String,
     selected: Boolean,
+    favorite: Boolean,
     border: Drawable?,
     borderSelected: Drawable?,
-    favIcon: Drawable?
+    favIcon: Drawable?,
+    favIconSelected: Drawable?
 ) {
     cameraName.text = name
-    favButton.background = favIcon
-    if (selected) {
-        constraint.background = borderSelected
+    constraint.background = if (selected) {
+        borderSelected
     } else {
-        constraint.background = border
+        border
+    }
+    favButton.background = if (favorite) {
+        favIconSelected
+    } else {
+        favIcon
+    }
+}
+
+fun ListViewItemBinding.bindFavButton(
+    camera: Camera,
+    favIcon: Drawable?,
+    favIconSelected: Drawable?
+) {
+    if (camera.favorite) {
+        camera.favorite = false
+        favButton.background = favIcon
+    } else {
+        camera.favorite = true
+        favButton.background = favIconSelected
     }
 }
 
@@ -53,18 +73,20 @@ fun FragmentCamerasBinding.bindImageView(imgUrl: String?) {
     }
 }
 
-fun ListViewItemBinding.bindBackgroundItemSelected(
+fun ListViewItemBinding.bindBackgroundItem(
     camera: Camera?,
-    drawable: Drawable?
-): ListViewItemBinding {
-    camera?.selected = true
-    constraint.background = drawable
-    return this
-}
-
-fun ListViewItemBinding.bindBackgroundItemUnselected(camera: Camera?, drawable: Drawable?) {
-    camera?.selected = false
-    constraint.background = drawable
+    border: Drawable?,
+    borderSelected: Drawable?
+): ListViewItemBinding? {
+    return if (camera?.selected == false) {
+        camera.selected = true
+        constraint.background = borderSelected
+        this
+    } else {
+        camera?.selected = false
+        constraint.background = border
+        null
+    }
 }
 
 fun FragmentSplashBinding.bindProgressBar(camerasDownloaded: Int?, totalCameras: Int?) {
@@ -88,11 +110,11 @@ fun FragmentCamerasBinding.bindAdapter(
     adapter: CamerasAdapter
 ) {
     with(adapter) {
-        normalList = viewModel.allCameras
-        currentList = viewModel.allCameras
-        setOrderList(viewModel.lastOrder)
         lastBindingItem = viewModel.lastBindingItem
         lastCameraSelected = viewModel.lastCameraSelected
+        normalList = viewModel.allCameras
+        currentList = viewModel.allCameras
+        setListByOrder(viewModel.lastOrder)
         camerasList.adapter = this
         bindImageView(imgUrl = lastCameraSelected?.url)
     }
@@ -100,7 +122,7 @@ fun FragmentCamerasBinding.bindAdapter(
 
 fun MenuItem.bindSearch(menu: Menu, adapter: CamerasAdapter, context: Context) {
     val searchView = actionView as SearchView
-    with(searchView){
+    with(searchView) {
         queryHint = context.getString(R.string.search_query_hint)
         maxWidth = Integer.MAX_VALUE
         setOnQueryTextListener(
@@ -108,8 +130,9 @@ fun MenuItem.bindSearch(menu: Menu, adapter: CamerasAdapter, context: Context) {
                 override fun onQueryTextSubmit(auxQuery: String?): Boolean {
                     return false
                 }
+
                 override fun onQueryTextChange(query: String?): Boolean {
-                    adapter.setFilterList(query)
+                    adapter.setListByName(query)
                     return true
                 }
             })
@@ -120,6 +143,7 @@ fun MenuItem.bindSearch(menu: Menu, adapter: CamerasAdapter, context: Context) {
                 setItemsVisibility(menu, false)
                 return true
             }
+
             override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
                 setItemsVisibility(menu, true)
                 return true

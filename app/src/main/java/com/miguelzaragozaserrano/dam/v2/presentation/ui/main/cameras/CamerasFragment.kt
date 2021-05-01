@@ -12,11 +12,9 @@ import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.ViewModelFactory
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindAdapter
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindImageView
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindSearch
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.*
 import org.koin.android.ext.android.inject
 
 class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
@@ -29,8 +27,11 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
     private val adapter by lazy {
         CamerasAdapter(
             context = requireContext(),
-            onClickCamera = OnClickCameraListener { camera, binding ->
+            onItemClicked = OnClickItemListView { camera, binding, _ ->
                 setCameraSelected(camera, binding)
+            },
+            onFavButtonClicked = OnClickItemListView { camera, _, favorite ->
+                setCameraFavorite(camera, favorite)
             })
     }
 
@@ -57,15 +58,15 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             R.id.order_icon -> {
                 when (adapter.order) {
                     NORMAL -> {
-                        adapter.setOrderList(ASCENDING)
+                        adapter.setListByOrder(ASCENDING)
                         viewModel.lastOrder = ASCENDING
                     }
                     ASCENDING -> {
-                        adapter.setOrderList(DESCENDING)
+                        adapter.setListByOrder(DESCENDING)
                         viewModel.lastOrder = DESCENDING
                     }
                     DESCENDING -> {
-                        adapter.setOrderList(ASCENDING)
+                        adapter.setListByOrder(ASCENDING)
                         viewModel.lastOrder = ASCENDING
                     }
                 }
@@ -80,6 +81,18 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             R.id.search_icon -> {
                 itemSelected.bindSearch(menu, adapter, requireContext())
             }
+            R.id.fav_icon -> {
+                when (adapter.type) {
+                    ALL -> {
+                        adapter.setListByType(FAVORITE)
+                        viewModel.lastType = FAVORITE
+                    }
+                    FAVORITE -> {
+                        adapter.setListByType(ALL)
+                        viewModel.lastType = ALL
+                    }
+                }
+            }
         }
     }
 
@@ -89,6 +102,10 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             viewModel.lastBindingItem = lastBindingItem
             binding.bindImageView(imgUrl = lastCamera.url)
         }
+    }
+
+    private fun setCameraFavorite(camera: Camera, favorite: Boolean) {
+        viewModel.setCameraFavorite(camera, favorite)
     }
 
 }
