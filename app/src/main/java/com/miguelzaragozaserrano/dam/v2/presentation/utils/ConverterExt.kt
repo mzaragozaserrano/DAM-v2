@@ -1,7 +1,7 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
 import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
-import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
+import com.miguelzaragozaserrano.dam.v2.data.models.Camera
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle

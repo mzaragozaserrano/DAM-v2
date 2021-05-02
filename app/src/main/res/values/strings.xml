@@ -17,8 +17,8 @@
     <string name="action_recharge">Recargar lista</string>
     <string name="loading_cameras">…cargando cámaras…</string>
     <string name="check_connection">Por favor, compruebe su conexión</string>
-    <string name="alert_cluster_title">¿Quieres activar el modo Cluster?</string>
-    <string name="alert_cluster_message">Esta opción te permite agrupar un conjunto de marcadores cercanos representados como una agrupación, para facilitar la visualización de un mapa con muchos marcadores.</string>
+    <string name="cluster_title">¿Quieres activar el modo Cluster?</string>
+    <string name="cluster_message">Esta opción te permite agrupar un conjunto de marcadores cercanos representados como una agrupación, para facilitar la visualización de un mapa con muchos marcadores.</string>
     <string name="fav_button">Favoritas</string>
     <string name="alert_reset_title">¿Deseas resetear la lista de favoritos?</string>
     <string name="alert_reset_message">Estás a punto de vaciar toda tu lista de favoritos. Esta operación no tiene vuelta atrás. ¿Estás seguro que quieres llevarla acabo?</string>
@@ -29,11 +29,11 @@
     <string name="loading_opening">… abriendo fichero …</string>
     <string name="loading_reading">… leyendo fichero …</string>
     <string name="loading_getting">… cargando cámaras …</string>
-    <string name="with_cluster">Con Cluster</string>
-    <string name="without_cluster">Sin Cluster</string>
+    <string name="with_cluster_button">Con Cluster</string>
+    <string name="without_cluster_button">Sin Cluster</string>
     <string name="content_description">Description</string>
     <string name="recharge_title">¿Deseas recargar los datos?</string>
-    <string name="recharge_message">\"La última vez que se descargó el fichero fue el \"</string>
+    <string name="recharge_message">La última vez que se descargó el fichero fue el </string>
     <string name="recharge_button">Recargar</string>
     <string name="cancel_button">Cancelar</string>
 </resources>

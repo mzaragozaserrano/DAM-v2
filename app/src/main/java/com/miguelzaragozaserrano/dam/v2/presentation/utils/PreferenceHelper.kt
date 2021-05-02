@@ -3,6 +3,7 @@ package com.miguelzaragozaserrano.dam.v2.presentation.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.DATE
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.NEW_APP
 
 object PreferenceHelper {
 
@@ -16,7 +17,7 @@ object PreferenceHelper {
     }
 
     var SharedPreferences.date
-        get() = getString(DATE, "")
+        get() = getString(DATE, NEW_APP)
         set(value) {
             editMe {
                 it.putString(DATE, value)

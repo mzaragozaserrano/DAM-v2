@@ -3,19 +3,30 @@ package com.miguelzaragozaserrano.dam.v2.presentation.utils
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.clustering.ClusterManager
 import com.miguelzaragozaserrano.dam.v2.R
+import com.miguelzaragozaserrano.dam.v2.data.models.Camera
+import com.miguelzaragozaserrano.dam.v2.data.models.MyCluster
+import com.miguelzaragozaserrano.dam.v2.data.models.SearchViewState
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentCamerasBinding
+import com.miguelzaragozaserrano.dam.v2.databinding.FragmentMapBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentSplashBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
-import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.cameras.CamerasAdapter
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.setItemsVisibility
@@ -57,7 +68,8 @@ fun ListViewItemBinding.bindFavButton(
 }
 
 fun FragmentCamerasBinding.bindImageView(imgUrl: String?) {
-    imgUrl?.let {
+    if (imgUrl != null) {
+        this.cameraImage.visibility = View.VISIBLE
         val imgUri = imgUrl.toUri().buildUpon().scheme("http").build()
         GlideApp.with(this.cameraImage.context)
             .load(imgUri)
@@ -70,6 +82,8 @@ fun FragmentCamerasBinding.bindImageView(imgUrl: String?) {
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(this.cameraImage as ImageView)
+    } else {
+        this.cameraImage.visibility = View.GONE
     }
 }
 
@@ -110,18 +124,31 @@ fun FragmentCamerasBinding.bindAdapter(
     adapter: CamerasAdapter
 ) {
     with(adapter) {
-        lastBindingItem = viewModel.lastBindingItem
-        lastCameraSelected = viewModel.lastCameraSelected
+        bindingItem = viewModel.adapterState.bindingItem
+        cameraSelected = viewModel.adapterState.camera
+        type = viewModel.adapterState.type
         normalList = viewModel.allCameras
         currentList = viewModel.allCameras
-        setListByOrder(viewModel.lastOrder)
+        setListByOrder(viewModel.adapterState.order)
         camerasList.adapter = this
-        bindImageView(imgUrl = lastCameraSelected?.url)
+        bindImageView(imgUrl = cameraSelected?.url)
     }
 }
 
-fun MenuItem.bindSearch(menu: Menu, adapter: CamerasAdapter, context: Context) {
+fun MenuItem.bindSearch(
+    menu: Menu?,
+    adapter: CamerasAdapter,
+    context: Context,
+    searchViewState: SearchViewState
+) {
     val searchView = actionView as SearchView
+    if (searchViewState.focus) {
+        expandActionView()
+        searchView.isIconified = false
+        searchView.setQuery(searchViewState.query, true)
+        adapter.setList(searchViewState.query)
+        menu?.let { setItemsVisibility(it, false) }
+    }
     with(searchView) {
         queryHint = context.getString(R.string.search_query_hint)
         maxWidth = Integer.MAX_VALUE
@@ -132,7 +159,9 @@ fun MenuItem.bindSearch(menu: Menu, adapter: CamerasAdapter, context: Context) {
                 }
 
                 override fun onQueryTextChange(query: String?): Boolean {
-                    adapter.setListByName(query)
+                    Log.d("hola", query.toString())
+                    adapter.setList(query)
+                    searchViewState.query = query
                     return true
                 }
             })
@@ -140,16 +169,68 @@ fun MenuItem.bindSearch(menu: Menu, adapter: CamerasAdapter, context: Context) {
     setOnActionExpandListener(
         object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
-                setItemsVisibility(menu, false)
+                searchViewState.focus = true
+                menu?.let { setItemsVisibility(it, false) }
                 return true
             }
 
             override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
-                setItemsVisibility(menu, true)
+                searchViewState.focus = false
+                menu?.let { setItemsVisibility(it, true) }
                 return true
             }
         }
     )
-    this@bindSearch.expandActionView()
-    searchView.isIconified = false
+}
+
+fun FragmentMapBinding.bindMapView(
+    context: Context,
+    mapView: GoogleMap?,
+    cameras: List<Camera>?,
+    cluster: Boolean
+) {
+    mapView?.mapType = GoogleMap.MAP_TYPE_NORMAL
+    if (cluster) {
+        val clusterManager: ClusterManager<MyCluster> = ClusterManager(context, mapView)
+        mapView?.setOnCameraIdleListener(clusterManager)
+        mapView?.setOnMarkerClickListener(clusterManager)
+        for (camera in cameras.orEmpty()) {
+            val item =
+                MyCluster(
+                    LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()),
+                    camera.name,
+                    "${camera.latitude}, ${camera.latitude}"
+                )
+            clusterManager.addItem(item)
+            if (camera.selected) {
+                val cameraPosition =
+                    CameraPosition
+                        .Builder()
+                        .target(LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()))
+                        .zoom(12F).build()
+                mapView?.animateCamera(
+                    CameraUpdateFactory.newCameraPosition(cameraPosition)
+                )
+            }
+        }
+    } else {
+        for (camera in cameras.orEmpty()) {
+            val marker = MarkerOptions()
+                .position(LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()))
+                .title(camera.name)
+            if (camera.selected) {
+                mapView?.addMarker(marker)?.showInfoWindow()
+                val cameraPosition =
+                    CameraPosition
+                        .Builder()
+                        .target(LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()))
+                        .zoom(12F).build()
+                mapView?.animateCamera(
+                    CameraUpdateFactory.newCameraPosition(cameraPosition)
+                )
+            } else {
+                mapView?.addMarker(marker)
+            }
+        }
+    }
 }

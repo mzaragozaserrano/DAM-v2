@@ -2,6 +2,7 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.splash
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.DATE
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.NEW_APP
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.customPreference
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.date
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.isNextDay
@@ -34,10 +36,17 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     private val dbListCamerasObserver: Observer<List<CameraEntity>> by lazy {
         Observer { cameras ->
             if (cameras.isEmpty() || viewModel.isRechargeRequest) {
-                getDataFromUrl()
+                getDataFromUrl(
+
+                )
             } else {
                 if (viewModel.isFirstTime) {
-                    checkIfNextDay(cameras)
+                    if(prefs.date != NEW_APP) {
+                        checkIfNextDay(cameras)
+                    } else{
+                        viewModel.isFirstTime = false
+                        getDataFromUrl()
+                    }
                 } else {
                     if (viewModel.isFileDownloaded()) {
                         prefs.date = LocalDateTime.now().toDateString()
@@ -76,10 +85,12 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     }
 
     private fun checkIfNextDay(cameras: List<CameraEntity>) {
+        viewModel.isFirstTime = false
         if (isNextDay(
                 currentDay = LocalDateTime.now(), lastDay = prefs.date?.toDate()
             ) == true
         ) {
+            Log.d("hola", prefs.date.toString())
             showMessage(cameras)
         } else {
             goToCamerasFragment(cameras)
@@ -89,11 +100,12 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     private fun showMessage(cameras: List<CameraEntity>) {
         showDialogMessageComplete(
             title = getString(R.string.recharge_title),
-            message = getString(R.string.recharge_message) + prefs.date?.toDate()?.toDateString(),
+            message = getString(R.string.recharge_message) + " " + prefs.date?.toDate()?.toDateString(),
             positiveText = getString(R.string.recharge_button),
             negativeText = getString(R.string.cancel_button),
             icon = null,
             functionPositiveButton = {
+                viewModel.isRechargeRequest = true
                 getDataFromUrl()
             },
             functionNegativeButton = {
@@ -112,7 +124,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             viewModel.isRechargeRequest = false
             viewModel.clearDatabase()
         } else {
-            viewModel.isFirstTime = false
             viewModel.getDataFromUrl()
         }
     }

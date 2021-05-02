@@ -1,9 +1,5 @@
-package com.miguelzaragozaserrano.dam.v2.domain.models
+package com.miguelzaragozaserrano.dam.v2.data.models
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
-@Parcelize
 data class Camera(
     var id: String,
     var name: String,
@@ -12,4 +8,4 @@ data class Camera(
     var latitude: String,
     var longitude: String,
     var selected: Boolean
-) : Parcelable
+)

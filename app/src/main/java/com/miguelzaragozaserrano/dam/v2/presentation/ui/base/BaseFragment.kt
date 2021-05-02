@@ -16,6 +16,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
 
     private var menuId: Int = 0
     private var toolbar: Toolbar? = null
+    private var functionOnCreateOptionsMenu: (() -> Unit)? = null
     private lateinit var menu: Menu
 
     var callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -45,6 +46,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
             inflater.inflate(menuId, menu)
         }
         this.menu = menu
+        functionOnCreateOptionsMenu?.invoke()
     }
 
     abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup): VB
@@ -65,7 +67,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
 
     open fun onBackPressedFun() {}
 
-    fun setupToolbar(toolbar: Toolbar, titleId: Int, menuId: Int?, navigationIdIcon: Int?) {
+    fun setupToolbar(toolbar: Toolbar, titleId: Int, menuId: Int?, navigationIdIcon: Int?, functionOnCreateOptionsMenu: ((menu: Menu) -> Unit)? = null) {
         setSupportActionBar(toolbar)
         with(toolbar) {
             if (navigationIdIcon != null) {
@@ -75,11 +77,13 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
                 }
             }
         }
-
         toolbar.title = getString(titleId)
         this.toolbar = toolbar
         if (menuId != null) {
             this.menuId = menuId
+        }
+        if(functionOnCreateOptionsMenu != null){
+            this.functionOnCreateOptionsMenu = { functionOnCreateOptionsMenu(menu) }
         }
     }
 

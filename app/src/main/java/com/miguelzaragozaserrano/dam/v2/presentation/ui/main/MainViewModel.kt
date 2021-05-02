@@ -3,15 +3,14 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
+import com.miguelzaragozaserrano.dam.v2.data.models.AdapterState
+import com.miguelzaragozaserrano.dam.v2.data.models.Camera
+import com.miguelzaragozaserrano.dam.v2.data.models.SearchViewState
+import com.miguelzaragozaserrano.dam.v2.data.models.SettingsMapState
 import com.miguelzaragozaserrano.dam.v2.db.CameraDb
 import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
-import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
-import com.miguelzaragozaserrano.dam.v2.domain.repositories.interfaces.CameraRepository
+import com.miguelzaragozaserrano.dam.v2.db.repositories.CameraRepository
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseViewModel
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.downloadFile
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.numberCameras
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.onCameraDownload
@@ -27,10 +26,9 @@ class MainViewModel(context: Context) : BaseViewModel() {
     var isRechargeRequest = false
     var allCameras = mutableListOf<Camera>()
 
-    var lastOrder: Constants.ORDER = NORMAL
-    var lastType: Constants.TYPE = ALL
-    var lastCameraSelected: Camera? = null
-    var lastBindingItem: ListViewItemBinding? = null
+    var adapterState = AdapterState()
+    var searchViewState = SearchViewState()
+    var settingsMapState = SettingsMapState(cameras = allCameras)
 
     var dbListCameras: LiveData<List<CameraEntity>> = repository.getAllCameras()
 

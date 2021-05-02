@@ -2,32 +2,32 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.cameras
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.miguelzaragozaserrano.dam.v2.R
+import com.miguelzaragozaserrano.dam.v2.data.models.Camera
+import com.miguelzaragozaserrano.dam.v2.databinding.FragmentCamerasBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
-import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.ALL
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.FAVORITE
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindBackgroundItem
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindFavButton
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindListViewItem
 import java.util.*
 import kotlin.properties.Delegates
 
 class CamerasAdapter(
     private val context: Context,
     private val onItemClicked: OnClickItemListView,
-    private val onFavButtonClicked: OnClickItemListView
+    private val onFavButtonClicked: OnClickItemListView,
+    private val fragmentBinding: FragmentCamerasBinding
 ) : RecyclerView.Adapter<CamerasViewHolder>() {
 
     var order = NORMAL
     var type = ALL
-    var lastCameraSelected: Camera? = null
-    var lastBindingItem: ListViewItemBinding? = null
+    var cameraSelected: Camera? = null
+    var bindingItem: ListViewItemBinding? = null
     var normalList: List<Camera> = emptyList()
     var currentList: List<Camera> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
 
@@ -39,9 +39,9 @@ class CamerasAdapter(
         val camera = currentList[position]
         holder.itemView.apply {
             setOnClickListener {
-                if (camera != lastCameraSelected) {
-                    lastBindingItem?.bindBackgroundItem(
-                        camera = lastCameraSelected,
+                if (camera != cameraSelected) {
+                    bindingItem?.bindBackgroundItem(
+                        camera = cameraSelected,
                         border = getDrawable(
                             context,
                             R.drawable.border
@@ -51,13 +51,13 @@ class CamerasAdapter(
                             R.drawable.border_selected
                         )
                     )
-                    lastBindingItem =
+                    bindingItem =
                         holder.bindSelectedCamera(
                             context = context,
                             camera = camera
                         )
-                    onItemClicked.onClick(camera, lastBindingItem, camera.favorite)
-                    lastCameraSelected = camera
+                    onItemClicked.onClick(camera, bindingItem, camera.favorite)
+                    cameraSelected = camera
                     notifyDataSetChanged()
                 }
             }
@@ -69,31 +69,15 @@ class CamerasAdapter(
 
     fun setListByOrder(order: Constants.ORDER) {
         this.order = order
-        setList()
-    }
-
-    fun setListByName(query: String?) {
-        query?.let {
-            if (query != "") {
-                currentList = currentList.filter { camera ->
-                    camera.name.toLowerCase(Locale.getDefault())
-                        .contains(
-                            query.toLowerCase(Locale.getDefault())
-                        )
-                }
-            } else {
-                currentList = normalList
-                setListByOrder(order)
-            }
-        }
+        setList(null)
     }
 
     fun setListByType(type: Constants.TYPE) {
         this.type = type
-        setList()
+        setList(null)
     }
 
-    private fun setList() {
+    fun setList(query: String?) {
         currentList = when {
             type == ALL && order == ASCENDING -> {
                 normalList.sortedBy { camera ->
@@ -125,6 +109,21 @@ class CamerasAdapter(
                 }
             }
             else -> normalList
+        }
+        query?.let {
+            currentList = currentList.filter { camera ->
+                camera.name.toLowerCase(Locale.getDefault())
+                    .contains(
+                        query.toLowerCase(Locale.getDefault())
+                    )
+            }
+        }
+        if (!currentList.contains(cameraSelected)) {
+            fragmentBinding.bindImageView(null)
+        }else{
+            if(fragmentBinding.cameraImage.visibility == View.GONE) {
+                fragmentBinding.bindImageView(cameraSelected?.url)
+            }
         }
     }
 
