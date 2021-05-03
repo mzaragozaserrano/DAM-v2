@@ -56,9 +56,7 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
                 rootLayout = binding.cameraImage,
                 layoutToShowHide = binding.cameraImage,
                 swipeDirections = mutableListOf(
-                    ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM,
-                    ImageTouchHelper.SwipeDirection.RIGHT_TO_LEFT,
-                    ImageTouchHelper.SwipeDirection.LEFT_TO_RIGHT
+                    ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM
                 ),
                 functionOnLongClickListener = { goToMapFragment() },
                 functionOnRemoveImage = { removeCameraSelected() }
@@ -68,8 +66,6 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
                 rootLayout = binding.cameraImage,
                 layoutToShowHide = binding.cameraImage,
                 swipeDirections = mutableListOf(
-                    ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM,
-                    ImageTouchHelper.SwipeDirection.BOTTOM_TO_TOP,
                     ImageTouchHelper.SwipeDirection.LEFT_TO_RIGHT
                 ),
                 functionOnLongClickListener = { goToMapFragment() },
