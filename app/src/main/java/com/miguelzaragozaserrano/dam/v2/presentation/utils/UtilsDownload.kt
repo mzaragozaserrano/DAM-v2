@@ -1,5 +1,11 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
+import android.content.Context
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.miguelzaragozaserrano.dam.v2.data.models.Camera
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +33,11 @@ object UtilsDownload {
                     for (data in allData.orEmpty()) {
                         if (allData?.get(0) != data) {
                             val nameAux =
-                                data.substringAfter("<Data name=\"Nombre\">").substringBefore("</Data>")
+                                data.substringAfter("<Data name=\"Nombre\">")
+                                    .substringBefore("</Data>")
                             val coordinateAux =
-                                data.substringAfter("<coordinates>").substringBefore("</coordinates>")
+                                data.substringAfter("<coordinates>")
+                                    .substringBefore("</coordinates>")
                             val latitude = coordinateAux.substringAfter(",").substringBefore(",10")
                             val longitude = coordinateAux.substringBefore(",")
                             onCameraDownload.invoke(

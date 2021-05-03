@@ -1,9 +1,15 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.ui.base
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.viewbinding.ViewBinding
+import com.google.android.material.snackbar.Snackbar
+import com.miguelzaragozaserrano.dam.v2.R
 
 abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
 
@@ -73,7 +79,7 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
                 }
         }
         val alert = builder.create()
-        //alert.window?.setBackgroundDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.dialog_fragment))
+        alert.window?.setBackgroundDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.dialog_background))
         alert.show()
     }
 
@@ -83,7 +89,7 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
         positiveText: String,
         icon: Int? = null,
         cancelable: Boolean = false,
-        functionPositiveButton: (_positiveDialog: AlertDialog) -> Unit
+        functionPositiveButton: () -> Unit
     ) {
         val builder = AlertDialog.Builder(this)
         if (icon != null) {
@@ -92,19 +98,44 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
                 .setIcon(icon)
                 .setCancelable(cancelable)
                 .setPositiveButton(positiveText) { _, _ ->
-                    functionPositiveButton(dialog)
+                    functionPositiveButton()
+                }
+                .setNegativeButton(getString(R.string.cancel_button)) { dialog, _ ->
+                    dialog.dismiss()
                 }
         } else {
             builder.setTitle(title)
                 .setMessage(message)
                 .setCancelable(cancelable)
                 .setPositiveButton(positiveText) { _, _ ->
-                    functionPositiveButton(dialog)
+                    functionPositiveButton()
+                }
+                .setNegativeButton(getString(R.string.cancel_button)) { dialog, _ ->
+                    dialog.dismiss()
                 }
         }
         val alert = builder.create()
-        //alert.window?.setBackgroundDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.dialog_fragment))
+        alert.window?.setBackgroundDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.dialog_background))
         alert.show()
+    }
+
+    fun isNetworkAvailable(): Boolean {
+        val connectivityManager = applicationContext
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities = connectivityManager
+            .getNetworkCapabilities(connectivityManager.activeNetwork)
+        return capabilities != null
+    }
+
+    fun showSnack(view: View?, text: String, context: Context?, colorBackground: Int, colorText: Int) {
+        view?.let {
+            context?.let {
+                val snack = Snackbar.make(view, text, Snackbar.LENGTH_LONG)
+                snack.view.setBackgroundColor(ContextCompat.getColor(context, colorBackground))
+                snack.setTextColor(ContextCompat.getColor(context, colorText))
+                snack.show()
+            }
+        }
     }
 
 }

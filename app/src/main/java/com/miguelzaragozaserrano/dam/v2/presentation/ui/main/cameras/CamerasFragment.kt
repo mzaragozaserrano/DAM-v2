@@ -35,7 +35,7 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             onItemClicked = OnClickItemListView { camera, binding, _ ->
                 setCameraSelected(camera, binding)
             },
-            onFavButtonClicked = OnClickItemListView { camera, _, favorite ->
+            onItemLongClicked = OnClickItemListView { camera, _, favorite ->
                 setCameraFavorite(camera, favorite)
             })
     }
@@ -112,8 +112,7 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
                     showMessage()
                     viewModel.settingsMapState.showAll = true
                     viewModel.settingsMapState.cameras = viewModel.allCameras
-                }
-                else {
+                } else {
                     viewModel.adapterState.camera?.let { camera ->
                         viewModel.settingsMapState.showAll = false
                         viewModel.settingsMapState.cameras = listOf(camera)
@@ -168,7 +167,28 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             })
     }
 
+    private fun showError() {
+        showDialogMessageSimple(
+            title = getString(R.string.network_title),
+            message = getString(R.string.network_message),
+            positiveText = getString(R.string.retry_button),
+            icon = null,
+            functionPositiveButton = {
+                goToMapFragment()
+            }
+        )
+    }
+
     private fun setCameraSelected(camera: Camera?, bindingItem: ListViewItemBinding?) {
+        if (!isNetworkAvailable()) {
+            showSnack(
+                view,
+                getString(R.string.network_title),
+                context,
+                R.color.red_600,
+                R.color.white_50
+            )
+        }
         if (camera != null && bindingItem != null) {
             viewModel.adapterState.camera = camera
             viewModel.adapterState.bindingItem = bindingItem
@@ -182,7 +202,11 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
     }
 
     private fun goToMapFragment() {
-        findNavController().navigate(R.id.action_cameras_fragment_to_map_fragment)
+        if (isNetworkAvailable()) {
+            findNavController().navigate(R.id.action_cameras_fragment_to_map_fragment)
+        } else {
+            showError()
+        }
     }
 
 }

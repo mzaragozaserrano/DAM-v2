@@ -1,8 +1,8 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
@@ -12,32 +12,39 @@ import androidx.navigation.navGraphViewModels
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
-import com.google.gson.Gson
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.clustering.ClusterManager
 import com.miguelzaragozaserrano.dam.v2.R
-import com.miguelzaragozaserrano.dam.v2.data.dto.response.GoogleMapsResponse
+import com.miguelzaragozaserrano.dam.v2.data.models.Camera
+import com.miguelzaragozaserrano.dam.v2.data.models.MyCluster
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentMapBinding
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.GOOGLE_MAP_DIR
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.REQUEST_CODE
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getLastLocation
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.ViewModelFactory
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.bindMapView
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getParameters
 import org.koin.android.ext.android.inject
 
 class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
 
-    private var mapView: GoogleMap? = null
+    private var googleMap: GoogleMap? = null
     private var mapFragment: SupportMapFragment? = null
     private val fineLocationPermission = Manifest.permission.ACCESS_FINE_LOCATION
-    private var polyline: Polyline? = null
+    private val coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION
 
+    private val icon: BitmapDescriptor by lazy {
+        val color = getColor(requireContext(), R.color.green_500)
+        BitmapHelper.vectorToBitmap(requireContext(), R.drawable.ic_camera, color)
+    }
 
     private val factory: ViewModelFactory by inject()
     private val viewModel: MainViewModel by navGraphViewModels(R.id.nav_main) {
@@ -51,9 +58,33 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
 
     override fun setup2Listeners() {
         super.setup2Listeners()
-        binding.iconLocation.apply {
-            setOnClickListener {
-                getLocationPermission()
+        with(binding) {
+            iconLocation.apply {
+                setOnClickListener {
+                    getLocationPermission()
+                }
+            }
+            chipGroup.apply {
+                setOnCheckedChangeListener { _, checkedId ->
+                    when (checkedId) {
+                        binding.hybridChip.id -> {
+                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_HYBRID
+                            googleMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
+                        }
+                        binding.satelliteChip.id -> {
+                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                            googleMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                        }
+                        binding.normalChip.id -> {
+                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_NORMAL
+                            googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+                        }
+                        binding.topographicalChip.id -> {
+                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                            googleMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                        }
+                    }
+                }
             }
         }
     }
@@ -71,17 +102,16 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
 
     override fun onBackPressedFun() {
         super.onBackPressedFun()
+        with(viewModel.mapViewState) {
+            polyline = null
+            urlPolyline = ""
+        }
         findNavController().navigate(R.id.action_map_fragment_to_cameras_fragment)
     }
 
-    override fun onMapReady(mapView: GoogleMap?) {
-        this.mapView = mapView
-        binding.bindMapView(
-            context = requireContext(),
-            mapView = mapView,
-            cameras = viewModel.settingsMapState.cameras,
-            cluster = viewModel.settingsMapState.cluster
-        )
+    override fun onMapReady(googleMap: GoogleMap?) {
+        this.googleMap = googleMap
+        bindMapView()
     }
 
     override fun onRequestPermissionsResult(
@@ -115,24 +145,18 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            if (mapView?.isMyLocationEnabled == false) {
-                /*if(hasConnection(getApplication<Application>())){
-                    *//* Si hay conexión, obtenemos los permisos y cambiamos el icono *//*
-                getLocationPermission()
+            if (googleMap?.isMyLocationEnabled == false) {
+                googleMap?.isMyLocationEnabled = true
+                viewModel.mapViewState.locationEnable = true
+                googleMap?.uiSettings?.isMyLocationButtonEnabled = true
                 binding.iconLocation.setImageResource(R.drawable.ic_marker_on)
-            }else
-            *//* Si no hay conexión, mostramos un mensaje *//*
-                Toast
-                    .makeText(context, context.getString(R.string.check_connection), Toast.LENGTH_LONG)
-                    .show()*/
-                mapView?.isMyLocationEnabled = true
-                mapView?.uiSettings?.isMyLocationButtonEnabled = true
-                getLocation()
-                binding.iconLocation.setImageResource(R.drawable.ic_marker_on)
+                getDirection()
             } else {
-                mapView?.isMyLocationEnabled = false
-                mapView?.uiSettings?.isMyLocationButtonEnabled = false
-                polyline?.remove()
+                googleMap?.isMyLocationEnabled = false
+                viewModel.mapViewState.locationEnable = false
+                googleMap?.uiSettings?.isMyLocationButtonEnabled = false
+                viewModel.mapViewState.polyline?.remove()
+                viewModel.mapViewState.urlPolyline = null
                 binding.iconLocation.setImageResource(R.drawable.ic_marker_off)
             }
         } else {
@@ -140,78 +164,97 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
         }
     }
 
-    private fun getLocation() {
+    private fun getDirection() {
         val location = getLastLocation(requireContext())
         location?.let {
             val myLocation = LatLng(location.latitude, location.longitude)
-            mapView?.uiSettings?.isMyLocationButtonEnabled = true
-            val origin = "origin=" + myLocation.latitude + "," + myLocation.longitude + "&"
-            val destination = "destination=" +
-                    viewModel.adapterState.camera?.latitude +
-                    "," + viewModel.adapterState.camera?.longitude + "&"
-            val parameters = origin +
-                    destination +
-                    "sensor=false&mode=driving&key=" +
-                    getString(R.string.google_maps_key)
-            loadURL("https://maps.googleapis.com/maps/api/directions/json?$parameters")
+            val urlDirection = GOOGLE_MAP_DIR + getParameters(
+                myLocation,
+                viewModel
+            ) + getString(R.string.google_maps_key)
+            with(viewModel.mapViewState) {
+                urlPolyline = urlDirection
+                loadURL(urlDirection)
+            }
         }
+    }
+
+    private fun loadURL(url: String) {
+        val queue = Volley.newRequestQueue(requireContext())
+        val response = StringRequest(Request.Method.GET, url, { response ->
+            val coordinates = Utils.getCoordinates(response, requireContext())
+            viewModel.mapViewState.polyline = googleMap?.addPolyline(coordinates)
+        }, {})
+        queue.add(response)
     }
 
     private fun askPermissions() {
         requestPermissions(
             arrayOf(
-                fineLocationPermission
+                fineLocationPermission,
+                coarseLocationPermission
             ), REQUEST_CODE
         )
     }
 
-    private fun loadURL(url: String) {
-        val queue = Volley.newRequestQueue(requireContext())
-        val request = StringRequest(Request.Method.GET, url, { response ->
-            val coordinates = getCoordinates(response)
-            polyline = mapView?.addPolyline(coordinates)
-        }, {})
-        queue.add(request)
-    }
-
-    private fun getCoordinates(response: String): PolylineOptions {
-        val obj = Gson().fromJson(response, GoogleMapsResponse::class.java)
-        val steps = obj.routes?.get(0)?.legs?.get(0)?.steps
-        val coordinates = PolylineOptions()
-        for (step in steps.orEmpty()) {
-            decodePoly(step.polyline?.points.toString(), coordinates)
+    @SuppressLint("MissingPermission")
+    private fun bindMapView() {
+        with(viewModel) {
+            if (mapViewState.locationEnable) {
+                binding.iconLocation.setImageResource(R.drawable.ic_marker_on)
+            } else {
+                binding.iconLocation.setImageResource(R.drawable.ic_marker_off)
+            }
+            mapViewState.urlPolyline?.let { url ->
+                loadURL(url)
+            }
+            googleMap?.isMyLocationEnabled = mapViewState.locationEnable
+            googleMap?.uiSettings?.isMyLocationButtonEnabled = mapViewState.locationEnable
+            googleMap?.setInfoWindowAdapter(MarkerInfoAdapter(requireContext()))
+            googleMap?.mapType = mapViewState.mapType
+            if (settingsMapState.cluster) {
+                val clusterManager: ClusterManager<MyCluster> =
+                    ClusterManager(requireContext(), googleMap)
+                googleMap?.setOnCameraIdleListener(clusterManager)
+                googleMap?.setOnMarkerClickListener(clusterManager)
+                for (camera in settingsMapState.cameras) {
+                    val item =
+                        MyCluster(
+                            LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()),
+                            camera.name,
+                            "${camera.latitude}, ${camera.latitude}"
+                        )
+                    clusterManager.addItem(item)
+                    getZoom(camera)
+                }
+            } else {
+                for (camera in settingsMapState.cameras) {
+                    val marker = MarkerOptions()
+                        .position(LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()))
+                        .title(camera.name)
+                        .icon(icon)
+                    googleMap?.addMarker(marker)?.tag = camera
+                    getZoom(camera)
+                }
+            }
         }
-        coordinates.color(getColor(requireContext(), R.color.indigo_900_dark)).width(15f)
-        return coordinates
     }
 
-    private fun decodePoly(encoded: String, coordinates: PolylineOptions) {
-        var index = 0
-        val len = encoded.length
-        var lat = 0
-        var lng = 0
-        while (index < len) {
-            var b: Int
-            var shift = 0
-            var result = 0
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lat += dlat
-            shift = 0
-            result = 0
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lng += dlng
-            val p = LatLng(lat.toDouble() / 1E5, lng.toDouble() / 1E5)
-            coordinates.add(p)
+    private fun getZoom(camera: Camera) {
+        if (camera.selected) {
+            val cameraPosition =
+                CameraPosition
+                    .Builder()
+                    .target(
+                        LatLng(
+                            camera.latitude.toDouble(),
+                            camera.longitude.toDouble()
+                        )
+                    )
+                    .zoom(12F).build()
+            googleMap?.animateCamera(
+                CameraUpdateFactory.newCameraPosition(cameraPosition)
+            )
         }
     }
 

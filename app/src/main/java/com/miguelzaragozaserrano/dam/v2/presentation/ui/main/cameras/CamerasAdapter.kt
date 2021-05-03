@@ -20,7 +20,7 @@ import kotlin.properties.Delegates
 class CamerasAdapter(
     private val context: Context,
     private val onItemClicked: OnClickItemListView,
-    private val onFavButtonClicked: OnClickItemListView,
+    private val onItemLongClicked: OnClickItemListView,
     private val fragmentBinding: FragmentCamerasBinding
 ) : RecyclerView.Adapter<CamerasViewHolder>() {
 
@@ -61,8 +61,13 @@ class CamerasAdapter(
                     notifyDataSetChanged()
                 }
             }
+            setOnLongClickListener {
+                holder.bindFavIcon(camera = camera, context = context)
+                setList(null)
+                onItemLongClicked.onClick(camera, null, camera.favorite)
+            }
         }
-        holder.bindItem(camera, context, onFavButtonClicked)
+        holder.bindItem(camera, context)
     }
 
     override fun getItemCount(): Int = currentList.size
@@ -132,7 +137,7 @@ class CamerasAdapter(
 class CamerasViewHolder private constructor(private val binding: ListViewItemBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bindItem(camera: Camera, context: Context, onFavButtonClicked: OnClickItemListView) =
+    fun bindItem(camera: Camera, context: Context) =
         with(binding) {
             bindListViewItem(
                 name = camera.name,
@@ -143,15 +148,6 @@ class CamerasViewHolder private constructor(private val binding: ListViewItemBin
                 favIcon = getDrawable(context, R.drawable.ic_favorite),
                 favIconSelected = getDrawable(context, R.drawable.ic_favorite_selected)
             )
-            favButton.apply {
-                setOnClickListener {
-                    bindFavButton(
-                        camera = camera, favIcon = getDrawable(context, R.drawable.ic_favorite),
-                        favIconSelected = getDrawable(context, R.drawable.ic_favorite_selected)
-                    )
-                    onFavButtonClicked.onClick(camera, null, camera.favorite)
-                }
-            }
         }
 
     fun bindSelectedCamera(
@@ -173,6 +169,15 @@ class CamerasViewHolder private constructor(private val binding: ListViewItemBin
         }
     }
 
+    fun bindFavIcon(camera: Camera, context: Context) {
+        with(binding) {
+            bindFavButton(
+                camera = camera, favIcon = getDrawable(context, R.drawable.ic_favorite),
+                favIconSelected = getDrawable(context, R.drawable.ic_favorite_selected)
+            )
+        }
+    }
+
     companion object {
         fun from(parent: ViewGroup): CamerasViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
@@ -185,6 +190,8 @@ class CamerasViewHolder private constructor(private val binding: ListViewItemBin
 }
 
 class OnClickItemListView(val clickListener: (camera: Camera, lastBindingItem: ListViewItemBinding?, isFavorite: Boolean) -> Unit) {
-    fun onClick(camera: Camera, lastBindingItem: ListViewItemBinding?, isFavorite: Boolean) =
+    fun onClick(camera: Camera, lastBindingItem: ListViewItemBinding?, isFavorite: Boolean): Boolean {
         clickListener(camera, lastBindingItem, isFavorite)
+        return true
+    }
 }

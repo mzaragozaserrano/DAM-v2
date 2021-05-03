@@ -3,10 +3,8 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.miguelzaragozaserrano.dam.v2.data.models.AdapterState
-import com.miguelzaragozaserrano.dam.v2.data.models.Camera
-import com.miguelzaragozaserrano.dam.v2.data.models.SearchViewState
-import com.miguelzaragozaserrano.dam.v2.data.models.SettingsMapState
+import com.google.android.gms.maps.GoogleMap
+import com.miguelzaragozaserrano.dam.v2.data.models.*
 import com.miguelzaragozaserrano.dam.v2.db.CameraDb
 import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
 import com.miguelzaragozaserrano.dam.v2.db.repositories.CameraRepository
@@ -26,6 +24,7 @@ class MainViewModel(context: Context) : BaseViewModel() {
     var isRechargeRequest = false
     var allCameras = mutableListOf<Camera>()
 
+    var mapViewState = MapViewState()
     var adapterState = AdapterState()
     var searchViewState = SearchViewState()
     var settingsMapState = SettingsMapState(cameras = allCameras)
