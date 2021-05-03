@@ -31,25 +31,24 @@ class CamerasAdapter(
     var normalList: List<Camera> = emptyList()
     var currentList: List<Camera> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CamerasViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): CamerasViewHolder {
         return CamerasViewHolder.from(parent)
     }
 
-    override fun onBindViewHolder(holder: CamerasViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CamerasViewHolder,
+        position: Int
+    ) {
         val camera = currentList[position]
         holder.itemView.apply {
             setOnClickListener {
                 if (camera != cameraSelected) {
                     bindingItem?.bindBackgroundItem(
                         camera = cameraSelected,
-                        border = getDrawable(
-                            context,
-                            R.drawable.border
-                        ),
-                        borderSelected = getDrawable(
-                            context,
-                            R.drawable.border_selected
-                        )
+                        context = context
                     )
                     bindingItem =
                         holder.bindSelectedCamera(
@@ -125,8 +124,8 @@ class CamerasAdapter(
         }
         if (!currentList.contains(cameraSelected)) {
             fragmentBinding.bindImageView(null)
-        }else{
-            if(fragmentBinding.cameraImage.visibility == View.GONE) {
+        } else {
+            if (fragmentBinding.cameraImage.visibility == View.GONE) {
                 fragmentBinding.bindImageView(cameraSelected?.url)
             }
         }
@@ -157,14 +156,7 @@ class CamerasViewHolder private constructor(private val binding: ListViewItemBin
         with(binding) {
             return bindBackgroundItem(
                 camera = camera,
-                border = getDrawable(
-                    context,
-                    R.drawable.border
-                ),
-                borderSelected = getDrawable(
-                    context,
-                    R.drawable.border_selected
-                )
+                context = context
             )
         }
     }
@@ -190,7 +182,11 @@ class CamerasViewHolder private constructor(private val binding: ListViewItemBin
 }
 
 class OnClickItemListView(val clickListener: (camera: Camera, lastBindingItem: ListViewItemBinding?, isFavorite: Boolean) -> Unit) {
-    fun onClick(camera: Camera, lastBindingItem: ListViewItemBinding?, isFavorite: Boolean): Boolean {
+    fun onClick(
+        camera: Camera,
+        lastBindingItem: ListViewItemBinding?,
+        isFavorite: Boolean
+    ): Boolean {
         clickListener(camera, lastBindingItem, isFavorite)
         return true
     }

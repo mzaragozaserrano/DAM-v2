@@ -19,6 +19,7 @@ import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.ORDER.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.ALL
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.TYPE.FAVORITE
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.date
 import org.koin.android.ext.android.inject
 
 class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
@@ -27,6 +28,8 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
     private val viewModel: MainViewModel by navGraphViewModels(R.id.nav_main) {
         factory
     }
+
+    private val imageTouchHelper = ImageTouchHelper()
 
     private val adapter by lazy {
         CamerasAdapter(
@@ -47,11 +50,17 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
 
     override fun setup2Listeners() {
         super.setup2Listeners()
-        binding.cameraImage.apply {
-            setOnClickListener {
-                goToMapFragment()
-            }
-        }
+        imageTouchHelper.initialize(
+            rootLayout = binding.cameraImage,
+            layoutToShowHide = binding.cameraImage,
+            swipeDirections = mutableListOf(
+                ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM,
+                ImageTouchHelper.SwipeDirection.RIGHT_TO_LEFT,
+                ImageTouchHelper.SwipeDirection.LEFT_TO_RIGHT
+            ),
+            functionOnLongClickListener = { goToMapFragment() },
+            functionOnRemoveImage = { removeCameraSelected() }
+        )
     }
 
     override fun setup4Vars() {
@@ -109,7 +118,19 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             R.id.show_all -> {
                 itemSelected.isChecked = !itemSelected.isChecked
                 if (itemSelected.isChecked) {
-                    showMessage()
+                    showDialogMessageComplete(
+                        title = getString(R.string.cluster_title),
+                        message = getString(R.string.cluster_message),
+                        positiveText = getString(R.string.with_cluster_button),
+                        negativeText = getString(R.string.without_cluster_button),
+                        icon = R.drawable.ic_cluster,
+                        functionPositiveButton = {
+                            viewModel.settingsMapState.cluster = true
+                        },
+                        functionNegativeButton = {
+                            viewModel.settingsMapState.cluster = false
+                        }
+                    )
                     viewModel.settingsMapState.showAll = true
                     viewModel.settingsMapState.cameras = viewModel.allCameras
                 } else {
@@ -120,10 +141,18 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
                 }
             }
             R.id.recharge -> {
-                viewModel.isRechargeRequest = true
-                viewModel.adapterState = AdapterState()
-                viewModel.searchViewState = SearchViewState()
-                findNavController().navigate(R.id.action_cameras_fragment_to_splash_fragment)
+                showDialogMessageSimple(
+                    title = getString(R.string.recharge_title),
+                    message = getString(R.string.recharge_message) + " " + prefs.date?.toDate(),
+                    positiveText = getString(R.string.recharge_button),
+                    icon = R.drawable.ic_recharge,
+                    functionPositiveButton = {
+                        viewModel.isRechargeRequest = true
+                        viewModel.adapterState = AdapterState()
+                        viewModel.searchViewState = SearchViewState()
+                        findNavController().navigate(R.id.action_cameras_fragment_to_splash_fragment)
+                    }
+                )
             }
             R.id.search_icon -> {
                 itemSelected.bindSearch(
@@ -152,36 +181,9 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
         }
     }
 
-    private fun showMessage() {
-        showDialogMessageComplete(
-            title = getString(R.string.cluster_title),
-            message = getString(R.string.cluster_message),
-            positiveText = getString(R.string.with_cluster_button),
-            negativeText = getString(R.string.without_cluster_button),
-            icon = null,
-            functionPositiveButton = {
-                viewModel.settingsMapState.cluster = true
-            },
-            functionNegativeButton = {
-                viewModel.settingsMapState.cluster = false
-            })
-    }
-
-    private fun showError() {
-        showDialogMessageSimple(
-            title = getString(R.string.network_title),
-            message = getString(R.string.network_message),
-            positiveText = getString(R.string.retry_button),
-            icon = null,
-            functionPositiveButton = {
-                goToMapFragment()
-            }
-        )
-    }
-
     private fun setCameraSelected(camera: Camera?, bindingItem: ListViewItemBinding?) {
         if (!isNetworkAvailable()) {
-            showSnack(
+            showSnackLong(
                 view,
                 getString(R.string.network_title),
                 context,
@@ -198,6 +200,23 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
     }
 
     private fun setCameraFavorite(camera: Camera, favorite: Boolean) {
+        if (favorite) {
+            showSnackShort(
+                view,
+                getString(R.string.camera_added),
+                context,
+                R.color.indigo_900,
+                R.color.white_50
+            )
+        } else {
+            showSnackShort(
+                view,
+                getString(R.string.camera_removed),
+                context,
+                R.color.indigo_900,
+                R.color.white_50
+            )
+        }
         viewModel.setCameraFavorite(camera, favorite)
     }
 
@@ -205,7 +224,29 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
         if (isNetworkAvailable()) {
             findNavController().navigate(R.id.action_cameras_fragment_to_map_fragment)
         } else {
-            showError()
+            showDialogMessageSimple(
+                title = getString(R.string.network_title),
+                message = getString(R.string.network_message),
+                positiveText = getString(R.string.retry_button),
+                icon = R.drawable.ic_network,
+                functionPositiveButton = {
+                    goToMapFragment()
+                }
+            )
+        }
+    }
+
+    private fun removeCameraSelected() {
+        with(viewModel.adapterState) {
+            camera?.selected = false
+            bindingItem?.bindRemoveBackgroundItem(context = requireContext())
+            bindingItem = null
+            camera = null
+        }
+        with(adapter) {
+            cameraSelected = null
+            bindingItem = null
+            notifyDataSetChanged()
         }
     }
 

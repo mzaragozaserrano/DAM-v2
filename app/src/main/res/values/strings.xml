@@ -2,22 +2,15 @@
     <string name="app_name">Cámaras de tráfico</string>
     <string name="cameras_fragment_title">Cámaras Madrid</string>
     <string name="map_fragment_title">Mapa de cámaras</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_cameras">CamerasActivity</string>
-    <string name="title_activity_maps">Map</string>
     <string name="title_satellite">Satélite</string>
     <string name="title_normal">Mapa</string>
     <string name="title_hybrid">Híbrido</string>
     <string name="title_topographical">Topográfico</string>
-    <string name="title_activity_a">Map</string>
     <string name="action_multiple">Mostrar todas</string>
-    <string name="action_single">Actual</string>
     <string name="search_button">Buscar</string>
     <string name="search_query_hint">Escribe el nombre de la cámara…</string>
     <string name="order_button">Ordenar</string>
     <string name="action_recharge">Recargar lista</string>
-    <string name="loading_cameras">…cargando cámaras…</string>
-    <string name="check_connection">Por favor, compruebe su conexión</string>
     <string name="cluster_title">¿Quieres activar el modo Cluster?</string>
     <string name="cluster_message">Esta opción te permite agrupar un conjunto de marcadores cercanos representados como una agrupación, para facilitar la visualización de un mapa con muchos marcadores.</string>
     <string name="fav_button">Favoritas</string>
@@ -26,10 +19,6 @@
     <string name="location">Ubicación</string>
     <string name="add_fav">Cámara añadida a favoritos</string>
     <string name="delete_fav">Cámara eliminada de favoritos</string>
-    <string name="title_activity_map">MapActivity</string>
-    <string name="loading_opening">… abriendo fichero …</string>
-    <string name="loading_reading">… leyendo fichero …</string>
-    <string name="loading_getting">… cargando cámaras …</string>
     <string name="with_cluster_button">Con Cluster</string>
     <string name="without_cluster_button">Sin Cluster</string>
     <string name="content_description">Description</string>
@@ -40,4 +29,6 @@
     <string name="network_title">Sin conexión a internet</string>
     <string name="network_message">No se ha podido realizar la tarea porque no existe una conexión a internet. \n¿Deseas intentarlo de nuevo?</string>
     <string name="retry_button">Reintentar</string>
+    <string name="camera_added">Cámara añadida a favoritos</string>
+    <string name="camera_removed">Cámara eliminada de favoritos</string>
 </resources>

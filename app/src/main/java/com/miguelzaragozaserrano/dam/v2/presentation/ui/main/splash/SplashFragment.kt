@@ -1,9 +1,6 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.splash
 
-import android.content.SharedPreferences
-import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -14,9 +11,7 @@ import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.DATE
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.NEW_APP
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.customPreference
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper.date
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.isNextDay
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.numberCameras
@@ -30,8 +25,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     private val viewModel: MainViewModel by navGraphViewModels(R.id.nav_main) {
         factory
     }
-
-    private lateinit var prefs: SharedPreferences
 
     private val dbListCamerasObserver: Observer<List<CameraEntity>> by lazy {
         Observer { cameras ->
@@ -55,11 +48,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                 }
             }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        prefs = customPreference(requireContext(), DATE)
     }
 
     override fun getViewBinding(
@@ -98,7 +86,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
                 ?.toDateString(),
             positiveText = getString(R.string.recharge_button),
             negativeText = getString(R.string.cancel_button),
-            icon = null,
+            icon = R.drawable.ic_recharge,
             functionPositiveButton = {
                 viewModel.isRechargeRequest = true
                 getDataFromUrl()
@@ -115,25 +103,25 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
     }
 
     private fun getDataFromUrl() {
-        if(isNetworkAvailable()){
+        if (isNetworkAvailable()) {
             if (viewModel.isRechargeRequest) {
                 viewModel.isRechargeRequest = false
                 viewModel.clearDatabase()
             } else {
                 viewModel.getDataFromUrl()
             }
-        }else{
+        } else {
             showError()
         }
     }
 
-    private fun showError(){
+    private fun showError() {
         showDialogMessageComplete(
             title = getString(R.string.network_title),
             message = getString(R.string.network_message),
             positiveText = getString(R.string.retry_button),
             negativeText = getString(R.string.cancel_button),
-            icon = null,
+            icon = R.drawable.ic_network,
             functionPositiveButton = {
                 getDataFromUrl()
             },

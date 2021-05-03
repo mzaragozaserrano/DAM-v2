@@ -8,8 +8,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -82,18 +84,26 @@ fun FragmentCamerasBinding.bindImageView(imgUrl: String?) {
 
 fun ListViewItemBinding.bindBackgroundItem(
     camera: Camera?,
-    border: Drawable?,
-    borderSelected: Drawable?
+    context: Context,
+    border: Int = R.drawable.border,
+    borderSelected: Int = R.drawable.border_selected,
 ): ListViewItemBinding? {
     return if (camera?.selected == false) {
         camera.selected = true
-        constraint.background = borderSelected
+        constraint.background = getDrawable(context, border)
         this
     } else {
         camera?.selected = false
-        constraint.background = border
+        constraint.background = getDrawable(context, borderSelected)
         null
     }
+}
+
+fun ListViewItemBinding.bindRemoveBackgroundItem(
+    context: Context,
+    border: Int = R.drawable.border,
+) {
+    constraint.background = getDrawable(context, border)
 }
 
 fun FragmentSplashBinding.bindProgressBar(camerasDownloaded: Int?, totalCameras: Int?) {
@@ -152,7 +162,6 @@ fun MenuItem.bindSearch(
                 }
 
                 override fun onQueryTextChange(query: String?): Boolean {
-                    Log.d("hola", query.toString())
                     adapter.setList(query)
                     searchViewState.query = query
                     return true

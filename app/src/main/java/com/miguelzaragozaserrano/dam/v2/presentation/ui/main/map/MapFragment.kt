@@ -42,7 +42,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
     private val coarseLocationPermission = Manifest.permission.ACCESS_COARSE_LOCATION
 
     private val icon: BitmapDescriptor by lazy {
-        val color = getColor(requireContext(), R.color.green_500)
+        val color = getColor(requireContext(), R.color.indigo_900)
         BitmapHelper.vectorToBitmap(requireContext(), R.drawable.ic_camera, color)
     }
 

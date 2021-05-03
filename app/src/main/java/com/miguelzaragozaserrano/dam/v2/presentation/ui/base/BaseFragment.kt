@@ -1,11 +1,14 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.ui.base
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.PreferenceHelper
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.setSupportActionBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -18,6 +21,8 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
     private var toolbar: Toolbar? = null
     private var functionOnCreateOptionsMenu: (() -> Unit)? = null
     private lateinit var menu: Menu
+
+    lateinit var prefs: SharedPreferences
 
     var callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -38,6 +43,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), CoroutineScope by Ma
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupInit()
+        prefs = PreferenceHelper.customPreference(requireContext(), Constants.DATE)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

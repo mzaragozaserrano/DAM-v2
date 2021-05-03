@@ -127,10 +127,21 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
         return capabilities != null
     }
 
-    fun showSnack(view: View?, text: String, context: Context?, colorBackground: Int, colorText: Int) {
+    fun showSnackLong(view: View?, text: String, context: Context?, colorBackground: Int, colorText: Int) {
         view?.let {
             context?.let {
                 val snack = Snackbar.make(view, text, Snackbar.LENGTH_LONG)
+                snack.view.setBackgroundColor(ContextCompat.getColor(context, colorBackground))
+                snack.setTextColor(ContextCompat.getColor(context, colorText))
+                snack.show()
+            }
+        }
+    }
+
+    fun showSnackShort(view: View?, text: String, context: Context?, colorBackground: Int, colorText: Int) {
+        view?.let {
+            context?.let {
+                val snack = Snackbar.make(view, text, Snackbar.LENGTH_SHORT)
                 snack.view.setBackgroundColor(ContextCompat.getColor(context, colorBackground))
                 snack.setTextColor(ContextCompat.getColor(context, colorText))
                 snack.show()

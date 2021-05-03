@@ -47,14 +47,30 @@ fun Fragment.showDialogMessageSimple(
     )
 }
 
-fun Fragment.showSnack(
+fun Fragment.showSnackLong(
     view: View?,
     text: String,
     context: Context?,
     colorBackground: Int,
     colorText: Int
 ) {
-    (activity as BaseActivity<*>).showSnack(
+    (activity as BaseActivity<*>).showSnackLong(
+        view,
+        text,
+        context,
+        colorBackground,
+        colorText
+    )
+}
+
+fun Fragment.showSnackShort(
+    view: View?,
+    text: String,
+    context: Context?,
+    colorBackground: Int,
+    colorText: Int
+) {
+    (activity as BaseActivity<*>).showSnackShort(
         view,
         text,
         context,
