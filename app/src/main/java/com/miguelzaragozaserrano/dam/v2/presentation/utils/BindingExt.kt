@@ -2,8 +2,8 @@ package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -11,11 +11,16 @@ import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
+import com.google.android.gms.maps.model.Marker
 import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.data.models.Camera
 import com.miguelzaragozaserrano.dam.v2.data.models.SearchViewState
@@ -185,17 +190,31 @@ fun MenuItem.bindSearch(
     )
 }
 
-fun AppCompatImageView.bindImageViewMarker(url: String) {
-    val imgUri = url.toUri().buildUpon().scheme("http").build()
-    GlideApp.with(this.context)
-        .load(imgUri)
-        .timeout(60000)
-        .apply(
-            RequestOptions()
-                .placeholder(R.drawable.loading_animation)
-                .error(R.drawable.broken_image)
-        )
-        .skipMemoryCache(true)
-        .diskCacheStrategy(DiskCacheStrategy.NONE)
-        .into(this)
+fun AppCompatImageView.bindImageViewMarker(url: String?, marker: Marker?) {
+    val imgUri = url?.toUri()?.buildUpon()?.scheme("http")?.build()
+    Glide.with(context).asBitmap().load(imgUri).override(500, 500)
+        .listener(object : RequestListener<Bitmap?> {
+            override fun onResourceReady(
+                resource: Bitmap?,
+                model: Any?,
+                target: Target<Bitmap?>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                if (dataSource != DataSource.MEMORY_CACHE) {
+                    marker?.showInfoWindow()
+                }
+                return false
+            }
+
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Bitmap?>?,
+                isFirstResource: Boolean
+            ): Boolean {
+                e?.printStackTrace()
+                return false
+            }
+        }).into(this)
 }

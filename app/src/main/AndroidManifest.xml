@@ -13,8 +13,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/DAMTheme"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/DAMTheme">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

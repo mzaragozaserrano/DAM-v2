@@ -1,5 +1,6 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.cameras
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -50,17 +51,31 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
 
     override fun setup2Listeners() {
         super.setup2Listeners()
-        imageTouchHelper.initialize(
-            rootLayout = binding.cameraImage,
-            layoutToShowHide = binding.cameraImage,
-            swipeDirections = mutableListOf(
-                ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM,
-                ImageTouchHelper.SwipeDirection.RIGHT_TO_LEFT,
-                ImageTouchHelper.SwipeDirection.LEFT_TO_RIGHT
-            ),
-            functionOnLongClickListener = { goToMapFragment() },
-            functionOnRemoveImage = { removeCameraSelected() }
-        )
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            imageTouchHelper.initialize(
+                rootLayout = binding.cameraImage,
+                layoutToShowHide = binding.cameraImage,
+                swipeDirections = mutableListOf(
+                    ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM,
+                    ImageTouchHelper.SwipeDirection.RIGHT_TO_LEFT,
+                    ImageTouchHelper.SwipeDirection.LEFT_TO_RIGHT
+                ),
+                functionOnLongClickListener = { goToMapFragment() },
+                functionOnRemoveImage = { removeCameraSelected() }
+            )
+        } else {
+            imageTouchHelper.initialize(
+                rootLayout = binding.cameraImage,
+                layoutToShowHide = binding.cameraImage,
+                swipeDirections = mutableListOf(
+                    ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM,
+                    ImageTouchHelper.SwipeDirection.BOTTOM_TO_TOP,
+                    ImageTouchHelper.SwipeDirection.LEFT_TO_RIGHT
+                ),
+                functionOnLongClickListener = { goToMapFragment() },
+                functionOnRemoveImage = { removeCameraSelected() }
+            )
+        }
     }
 
     override fun setup4Vars() {
@@ -192,10 +207,14 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             )
         }
         if (camera != null && bindingItem != null) {
-            viewModel.adapterState.camera = camera
-            viewModel.adapterState.bindingItem = bindingItem
-            viewModel.settingsMapState.cameras = listOf(camera)
-            binding.bindImageView(imgUrl = camera.url)
+            with(viewModel){
+                adapterState.camera = camera
+                adapterState.bindingItem = bindingItem
+                binding.bindImageView(imgUrl = camera.url)
+                if(!settingsMapState.showAll){
+                    settingsMapState.cameras = listOf(camera)
+                }
+            }
         }
     }
 

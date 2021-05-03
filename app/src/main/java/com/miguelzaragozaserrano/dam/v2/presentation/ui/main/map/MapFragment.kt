@@ -16,10 +16,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
 import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.data.models.Camera
@@ -30,6 +27,7 @@ import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.GOOGLE_MAP_DIR
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.REQUEST_CODE
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getCoordinates
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getLastLocation
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getParameters
 import org.koin.android.ext.android.inject
@@ -174,18 +172,31 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
             ) + getString(R.string.google_maps_key)
             with(viewModel.mapViewState) {
                 urlPolyline = urlDirection
-                loadURL(urlDirection)
+                loadURL(urlDirection, false)
             }
         }
     }
 
-    private fun loadURL(url: String) {
+    private fun loadURL(url: String, rotationScreen: Boolean) {
         val queue = Volley.newRequestQueue(requireContext())
+        var coordinates: PolylineOptions? = null
         val response = StringRequest(Request.Method.GET, url, { response ->
-            val coordinates = Utils.getCoordinates(response, requireContext())
-            viewModel.mapViewState.polyline = googleMap?.addPolyline(coordinates)
+            coordinates = getCoordinates(response, requireContext())
         }, {})
-        queue.add(response)
+        if (coordinates != null) {
+            viewModel.mapViewState.polyline = googleMap?.addPolyline(coordinates)
+            queue.add(response)
+        } else {
+            if (!rotationScreen) {
+                showSnackLong(
+                    view,
+                    getString(R.string.route_error),
+                    context,
+                    R.color.red_600,
+                    R.color.white_50
+                )
+            }
+        }
     }
 
     private fun askPermissions() {
@@ -206,41 +217,74 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
                 binding.iconLocation.setImageResource(R.drawable.ic_marker_off)
             }
             mapViewState.urlPolyline?.let { url ->
-                loadURL(url)
+                loadURL(url, true)
             }
             googleMap?.isMyLocationEnabled = mapViewState.locationEnable
             googleMap?.uiSettings?.isMyLocationButtonEnabled = mapViewState.locationEnable
-            googleMap?.setInfoWindowAdapter(MarkerInfoAdapter(requireContext()))
             googleMap?.mapType = mapViewState.mapType
             if (settingsMapState.cluster) {
-                val clusterManager: ClusterManager<MyCluster> =
-                    ClusterManager(requireContext(), googleMap)
-                googleMap?.setOnCameraIdleListener(clusterManager)
-                googleMap?.setOnMarkerClickListener(clusterManager)
-                for (camera in settingsMapState.cameras) {
-                    val item =
-                        MyCluster(
-                            LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()),
-                            camera.name,
-                            "${camera.latitude}, ${camera.latitude}"
-                        )
-                    clusterManager.addItem(item)
-                    getZoom(camera)
-                }
+                addCamerasWithCluster()
             } else {
-                for (camera in settingsMapState.cameras) {
-                    val marker = MarkerOptions()
-                        .position(LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()))
-                        .title(camera.name)
-                        .icon(icon)
-                    googleMap?.addMarker(marker)?.tag = camera
-                    getZoom(camera)
-                }
+                addCamerasWithoutCluster()
             }
+            googleMap?.setInfoWindowAdapter(MarkerInfoAdapter(requireContext()))
         }
     }
 
-    private fun getZoom(camera: Camera) {
+    private fun addCamerasWithCluster() {
+        val clusterManager: ClusterManager<MyCluster> =
+            ClusterManager(requireContext(), googleMap)
+        clusterManager.renderer =
+            googleMap?.let { map ->
+                CameraRenderer(
+                    context = requireContext(),
+                    map = map,
+                    clusterManager = clusterManager
+                )
+            }
+        clusterManager.markerCollection.setInfoWindowAdapter(
+            MarkerInfoAdapter(
+                requireContext()
+            )
+        )
+        for (camera in viewModel.settingsMapState.cameras) {
+            val item =
+                MyCluster(
+                    LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()),
+                    camera.name,
+                    "${camera.latitude}, ${camera.latitude}",
+                    camera.url
+                )
+            clusterManager.addItem(item)
+            getZoom(camera, viewModel.settingsMapState.cameras)
+        }
+        googleMap?.setOnCameraIdleListener {
+            clusterManager.onCameraIdle()
+        }
+    }
+
+    private fun addCamerasWithoutCluster() {
+        for (camera in viewModel.settingsMapState.cameras) {
+            val marker = MarkerOptions()
+                .position(LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()))
+                .title(camera.name)
+                .icon(icon)
+            googleMap?.addMarker(marker)?.tag = MyCluster(
+                LatLng(camera.latitude.toDouble(), camera.longitude.toDouble()),
+                camera.name,
+                "${camera.latitude}, ${camera.latitude}",
+                camera.url
+            )
+            getZoom(camera, viewModel.settingsMapState.cameras)
+        }
+    }
+
+    private fun getZoom(camera: Camera, cameras: List<Camera>) {
+        val zoom = if (cameras.size > 1) {
+            12F
+        } else {
+            20F
+        }
         if (camera.selected) {
             val cameraPosition =
                 CameraPosition
@@ -251,7 +295,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
                             camera.longitude.toDouble()
                         )
                     )
-                    .zoom(12F).build()
+                    .zoom(zoom).build()
             googleMap?.animateCamera(
                 CameraUpdateFactory.newCameraPosition(cameraPosition)
             )

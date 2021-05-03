@@ -11,11 +11,10 @@
     <string name="search_query_hint">Escribe el nombre de la cámara…</string>
     <string name="order_button">Ordenar</string>
     <string name="action_recharge">Recargar lista</string>
+    <string name="action_reset_fav">Resetear favoritos</string>
     <string name="cluster_title">¿Quieres activar el modo Cluster?</string>
     <string name="cluster_message">Esta opción te permite agrupar un conjunto de marcadores cercanos representados como una agrupación, para facilitar la visualización de un mapa con muchos marcadores.</string>
     <string name="fav_button">Favoritas</string>
-    <string name="alert_reset_title">¿Deseas resetear la lista de favoritos?</string>
-    <string name="alert_reset_message">Estás a punto de vaciar toda tu lista de favoritos. Esta operación no tiene vuelta atrás. \n¿Estás seguro que quieres llevarla acabo?</string>
     <string name="location">Ubicación</string>
     <string name="add_fav">Cámara añadida a favoritos</string>
     <string name="delete_fav">Cámara eliminada de favoritos</string>
@@ -27,8 +26,9 @@
     <string name="recharge_button">Recargar</string>
     <string name="cancel_button">Cancelar</string>
     <string name="network_title">Sin conexión a internet</string>
-    <string name="network_message">No se ha podido realizar la tarea porque no existe una conexión a internet. \n¿Deseas intentarlo de nuevo?</string>
+    <string name="network_message">No se ha podido realizar la tarea porque no existe una conexión a internet.\n¿Deseas intentarlo de nuevo?</string>
     <string name="retry_button">Reintentar</string>
     <string name="camera_added">Cámara añadida a favoritos</string>
     <string name="camera_removed">Cámara eliminada de favoritos</string>
+    <string name="route_error">No se ha podido encontrar una ruta</string>
 </resources>

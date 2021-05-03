@@ -53,9 +53,10 @@ class ImageTouchHelper :
         var maxSwipeDistance = 1
         private val swipeVelocityThreshold = 1
 
-        override fun onLongPress(e: MotionEvent?) {
-            super.onLongPress(e)
+        override fun onSingleTapUp(e: MotionEvent?): Boolean {
+            super.onSingleTapUp(e)
             functionOnLongClickListener?.invoke()
+            return true
         }
 
         override fun onDown(e: MotionEvent): Boolean {

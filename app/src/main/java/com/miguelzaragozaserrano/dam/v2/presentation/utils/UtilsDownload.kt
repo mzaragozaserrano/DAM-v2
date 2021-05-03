@@ -1,23 +1,26 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
-import android.content.Context
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
+import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import com.miguelzaragozaserrano.dam.v2.data.models.Camera
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 
 object UtilsDownload {
 
     var numberCameras: Int? = -1
     lateinit var onCameraDownload: ((camera: Camera) -> Unit)
+    lateinit var onImageDownload: ((image: BitmapDrawable) -> Unit)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun downloadFile() {
@@ -59,4 +62,17 @@ object UtilsDownload {
         }
     }
 
+    @Throws(IOException::class)
+    fun drawableFromUrl(url: String?) {
+        this.coroutineScope.launch {
+            runCatching {
+                val x: Bitmap
+                val connection: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
+                connection.connect()
+                val input: InputStream = connection.inputStream
+                x = BitmapFactory.decodeStream(input)
+                onImageDownload.invoke(BitmapDrawable(Resources.getSystem(), x))
+            }
+        }
+    }
 }

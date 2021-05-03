@@ -18,38 +18,22 @@ class CameraRenderer(
     clusterManager: ClusterManager<MyCluster>
 ) : DefaultClusterRenderer<MyCluster>(context, map, clusterManager) {
 
-    /**
-     * The icon to use for each cluster item
-     */
-/*    private val bicycleIcon: BitmapDescriptor by lazy {
-        val color = ContextCompat.getColor(context,
-            R.color.colorPrimary
-        )
-        BitmapHelper.vectorToBitmap(
-            context,
-            R.drawable.ic_directions_bike_black_24dp,
-            color
-        )
-    }*/
+    private val icon: BitmapDescriptor by lazy {
+        val color = ContextCompat.getColor(context, R.color.indigo_900)
+        BitmapHelper.vectorToBitmap(context, R.drawable.ic_camera, color)
+    }
 
-    /**
-     * Method called before the cluster item (the marker) is rendered.
-     * This is where marker options should be set.
-     */
-   /* override fun onBeforeClusterItemRendered(
+    override fun onBeforeClusterItemRendered(
         item: MyCluster,
         markerOptions: MarkerOptions
     ) {
-        markerOptions.title(item.name)
-            .position(item.latLng)
-            .icon(bicycleIcon)
+        markerOptions.title(item.title)
+            .position(item.position)
+            .icon(icon)
     }
 
-    *//**
-     * Method called right after the cluster item (the marker) is rendered.
-     * This is where properties for the Marker object should be set.
-     *//*
     override fun onClusterItemRendered(clusterItem: MyCluster, marker: Marker) {
         marker.tag = clusterItem
-    }*/
+    }
+
 }
