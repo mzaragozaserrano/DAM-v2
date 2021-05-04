@@ -28,23 +28,26 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
     private val dbListCamerasObserver: Observer<List<CameraEntity>> by lazy {
         Observer { cameras ->
-            if (prefs.date == NEW_APP && viewModel.isFirstTime || cameras.isEmpty() || viewModel.isRechargeRequest) {
-                viewModel.isFirstTime = false
-                getDataFromUrl()
-            } else {
-                if (viewModel.isFirstTime) {
-                    viewModel.isFirstTime = false
+            when {
+                cameras.size == 300 && viewModel.isRechargeRequest -> {
+                    viewModel.clearDatabase()
+                }
+                viewModel.isFirstTime && prefs.date != NEW_APP -> {
                     checkIfNextDay(cameras)
-                } else {
-                    if (viewModel.isFileDownloaded()) {
-                        prefs.date = LocalDateTime.now().toDateString()
-                        goToCamerasFragment(cameras)
-                    } else {
-                        binding.bindProgressBar(
-                            camerasDownloaded = cameras.size,
-                            totalCameras = numberCameras
-                        )
-                    }
+                }
+                viewModel.isFileDownloaded() && !viewModel.isRechargeRequest -> {
+                    prefs.date = LocalDateTime.now().toDateString()
+                    goToCamerasFragment(cameras)
+                }
+                cameras.isEmpty() -> {
+                    getDataFromUrl()
+                }
+                else -> {
+                    viewModel.isRechargeRequest = false
+                    binding.bindProgressBar(
+                        camerasDownloaded = cameras.size,
+                        totalCameras = numberCameras
+                    )
                 }
             }
         }
@@ -79,6 +82,21 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
         }
     }
 
+    private fun goToCamerasFragment(cameras: List<CameraEntity>) {
+        viewModel.allCameras.clear()
+        viewModel.allCameras.addAll(cameras.toListCamera())
+        findNavController().navigate(R.id.action_splash_fragment_to_cameras_fragment)
+    }
+
+    private fun getDataFromUrl() {
+        if (isNetworkAvailable()) {
+            viewModel.isFirstTime = false
+            viewModel.getDataFromUrl()
+        } else {
+            showError()
+        }
+    }
+
     private fun showMessage(cameras: List<CameraEntity>) {
         showDialogMessageComplete(
             title = getString(R.string.recharge_title),
@@ -88,31 +106,11 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
             negativeText = getString(R.string.cancel_button),
             icon = R.drawable.ic_recharge,
             functionPositiveButton = {
-                viewModel.isRechargeRequest = true
-                getDataFromUrl()
+                viewModel.clearDatabase()
             },
             functionNegativeButton = {
                 goToCamerasFragment(cameras)
             })
-    }
-
-    private fun goToCamerasFragment(cameras: List<CameraEntity>) {
-        viewModel.allCameras.clear()
-        viewModel.allCameras.addAll(cameras.toListCamera())
-        findNavController().navigate(R.id.action_splash_fragment_to_cameras_fragment)
-    }
-
-    private fun getDataFromUrl() {
-        if (isNetworkAvailable()) {
-            if (viewModel.isRechargeRequest) {
-                viewModel.isRechargeRequest = false
-                viewModel.clearDatabase()
-            } else {
-                viewModel.getDataFromUrl()
-            }
-        } else {
-            showError()
-        }
     }
 
     private fun showError() {

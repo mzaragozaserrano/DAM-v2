@@ -79,7 +79,12 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
                 }
         }
         val alert = builder.create()
-        alert.window?.setBackgroundDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.dialog_background))
+        alert.window?.setBackgroundDrawable(
+            ContextCompat.getDrawable(
+                applicationContext,
+                R.drawable.dialog_background
+            )
+        )
         alert.show()
     }
 
@@ -115,7 +120,12 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
                 }
         }
         val alert = builder.create()
-        alert.window?.setBackgroundDrawable(ContextCompat.getDrawable(applicationContext, R.drawable.dialog_background))
+        alert.window?.setBackgroundDrawable(
+            ContextCompat.getDrawable(
+                applicationContext,
+                R.drawable.dialog_background
+            )
+        )
         alert.show()
     }
 
@@ -127,7 +137,13 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
         return capabilities != null
     }
 
-    fun showSnackLong(view: View?, text: String, context: Context?, colorBackground: Int, colorText: Int) {
+    fun showSnackLong(
+        view: View?,
+        text: String,
+        context: Context?,
+        colorBackground: Int,
+        colorText: Int
+    ) {
         view?.let {
             context?.let {
                 val snack = Snackbar.make(view, text, Snackbar.LENGTH_LONG)
@@ -138,7 +154,13 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
         }
     }
 
-    fun showSnackShort(view: View?, text: String, context: Context?, colorBackground: Int, colorText: Int) {
+    fun showSnackShort(
+        view: View?,
+        text: String,
+        context: Context?,
+        colorBackground: Int,
+        colorText: Int
+    ) {
         view?.let {
             context?.let {
                 val snack = Snackbar.make(view, text, Snackbar.LENGTH_SHORT)

@@ -86,7 +86,7 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
         setupToolbar(
             toolbar = binding.toolbarComponent.toolbar,
             titleId = R.string.cameras_fragment_title,
-            menuId = R.menu.menu,
+            menuId = R.menu.menu_cameras,
             navigationIdIcon = null,
             functionOnCreateOptionsMenu = { menu -> bindToolbar(menu) }
         )
@@ -154,7 +154,8 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             R.id.recharge -> {
                 showDialogMessageSimple(
                     title = getString(R.string.recharge_title),
-                    message = getString(R.string.recharge_message) + " " + prefs.date?.toDate(),
+                    message = getString(R.string.recharge_message) + " " + prefs.date?.toDate()
+                        ?.toDateString(),
                     positiveText = getString(R.string.recharge_button),
                     icon = R.drawable.ic_recharge,
                     functionPositiveButton = {
@@ -203,11 +204,11 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
             )
         }
         if (camera != null && bindingItem != null) {
-            with(viewModel){
+            with(viewModel) {
                 adapterState.camera = camera
                 adapterState.bindingItem = bindingItem
                 binding.bindImageView(imgUrl = camera.url)
-                if(!settingsMapState.showAll){
+                if (!settingsMapState.showAll) {
                     settingsMapState.cameras = listOf(camera)
                 }
             }

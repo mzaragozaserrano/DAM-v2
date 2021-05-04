@@ -20,11 +20,13 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.data.models.Camera
 import com.miguelzaragozaserrano.dam.v2.data.models.SearchViewState
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentCamerasBinding
+import com.miguelzaragozaserrano.dam.v2.databinding.FragmentMapBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentSplashBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
@@ -217,4 +219,29 @@ fun AppCompatImageView.bindImageViewMarker(url: String?, marker: Marker?) {
                 return false
             }
         }).into(this)
+}
+
+fun FragmentMapBinding.bindChipGroup(
+    googleMap: GoogleMap?,
+    viewModel: MainViewModel,
+    checkedId: Int
+) {
+    when (checkedId) {
+        hybridChip.id -> {
+            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_HYBRID
+            googleMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
+        }
+        satelliteChip.id -> {
+            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_SATELLITE
+            googleMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+        }
+        normalChip.id -> {
+            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_NORMAL
+            googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+        }
+        topographicalChip.id -> {
+            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_TERRAIN
+            googleMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
+        }
+    }
 }

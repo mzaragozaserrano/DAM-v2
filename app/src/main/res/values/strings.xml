@@ -15,6 +15,7 @@
     <string name="cluster_title">¿Quieres activar el modo Cluster?</string>
     <string name="cluster_message">Esta opción te permite agrupar un conjunto de marcadores cercanos representados como una agrupación, para facilitar la visualización de un mapa con muchos marcadores.</string>
     <string name="fav_button">Favoritas</string>
+    <string name="location_button">Localización</string>
     <string name="location">Ubicación</string>
     <string name="add_fav">Cámara añadida a favoritos</string>
     <string name="delete_fav">Cámara eliminada de favoritos</string>

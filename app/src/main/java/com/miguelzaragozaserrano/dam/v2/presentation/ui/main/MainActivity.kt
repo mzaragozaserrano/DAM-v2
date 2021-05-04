@@ -8,8 +8,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.KoinContextHandler
 import org.koin.core.context.startKoin
 
-class
-MainActivity : BaseActivity<ActivityMainBinding>() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun getViewBinding() = ActivityMainBinding.inflate(layoutInflater)
 

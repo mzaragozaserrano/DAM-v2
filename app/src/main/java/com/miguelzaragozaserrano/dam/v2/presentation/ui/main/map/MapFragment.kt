@@ -2,9 +2,15 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.navigation.fragment.findNavController
@@ -16,7 +22,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.ClusterManager
 import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.data.models.Camera
@@ -25,10 +34,8 @@ import com.miguelzaragozaserrano.dam.v2.databinding.FragmentMapBinding
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.GOOGLE_MAP_DIR
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants.REQUEST_CODE
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getCoordinates
-import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getLastLocation
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Utils.getParameters
 import org.koin.android.ext.android.inject
 
@@ -57,31 +64,13 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
     override fun setup2Listeners() {
         super.setup2Listeners()
         with(binding) {
-            iconLocation.apply {
-                setOnClickListener {
-                    getLocationPermission()
-                }
-            }
             chipGroup.apply {
                 setOnCheckedChangeListener { _, checkedId ->
-                    when (checkedId) {
-                        binding.hybridChip.id -> {
-                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_HYBRID
-                            googleMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
-                        }
-                        binding.satelliteChip.id -> {
-                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_SATELLITE
-                            googleMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
-                        }
-                        binding.normalChip.id -> {
-                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_NORMAL
-                            googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
-                        }
-                        binding.topographicalChip.id -> {
-                            viewModel.mapViewState.mapType = GoogleMap.MAP_TYPE_TERRAIN
-                            googleMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
-                        }
-                    }
+                    binding.bindChipGroup(
+                        checkedId = checkedId,
+                        viewModel = viewModel,
+                        googleMap = googleMap
+                    )
                 }
             }
         }
@@ -92,10 +81,39 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
         setupToolbar(
             toolbar = binding.toolbarComponent.toolbar,
             titleId = R.string.map_fragment_title,
-            menuId = null,
-            navigationIdIcon = R.drawable.ic_arrow_back
+            menuId = R.menu.menu_map,
+            navigationIdIcon = R.drawable.ic_arrow_back,
+            functionOnCreateOptionsMenu = { menu -> bindToolbar(menu) }
         )
         initMap()
+    }
+
+    private fun bindToolbar(menu: Menu) {
+        with(viewModel) {
+            if (mapViewState.locationEnable) {
+                menu.findItem(R.id.location_icon).icon =
+                    AppCompatResources.getDrawable(requireContext(), R.drawable.ic_marker_on)
+            } else {
+                menu.findItem(R.id.location_icon).icon =
+                    AppCompatResources.getDrawable(requireContext(), R.drawable.ic_marker_off)
+            }
+        }
+    }
+
+    override fun toolbarItemSelected(itemSelected: MenuItem, menu: Menu) {
+        super.toolbarItemSelected(itemSelected, menu)
+        when(itemSelected.itemId) {
+            R.id.location_icon -> {
+                if(viewModel.mapViewState.locationEnable) {
+                    menu.findItem(R.id.location_icon).icon =
+                        AppCompatResources.getDrawable(requireContext(), R.drawable.ic_marker_off)
+                }else{
+                    menu.findItem(R.id.location_icon).icon =
+                        AppCompatResources.getDrawable(requireContext(), R.drawable.ic_marker_on)
+                }
+                getLocationPermission()
+            }
+        }
     }
 
     override fun onBackPressedFun() {
@@ -147,7 +165,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
                 googleMap?.isMyLocationEnabled = true
                 viewModel.mapViewState.locationEnable = true
                 googleMap?.uiSettings?.isMyLocationButtonEnabled = true
-                binding.iconLocation.setImageResource(R.drawable.ic_marker_on)
                 getDirection()
             } else {
                 googleMap?.isMyLocationEnabled = false
@@ -155,7 +172,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
                 googleMap?.uiSettings?.isMyLocationButtonEnabled = false
                 viewModel.mapViewState.polyline?.remove()
                 viewModel.mapViewState.urlPolyline = null
-                binding.iconLocation.setImageResource(R.drawable.ic_marker_off)
             }
         } else {
             askPermissions()
@@ -166,10 +182,11 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
         val location = getLastLocation(requireContext())
         location?.let {
             val myLocation = LatLng(location.latitude, location.longitude)
-            val urlDirection = GOOGLE_MAP_DIR + getParameters(
-                myLocation,
-                viewModel
-            ) + getString(R.string.google_maps_key)
+            val urlDirection =
+                Constants.GOOGLE_MAP_DIR + getParameters(
+                    myLocation,
+                    viewModel
+                ) + getString(R.string.google_maps_key)
             with(viewModel.mapViewState) {
                 urlPolyline = urlDirection
                 loadURL(urlDirection, false)
@@ -177,26 +194,25 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
         }
     }
 
-    private fun loadURL(url: String, rotationScreen: Boolean) {
+    private fun loadURL(url: String?, rotationScreen: Boolean) {
         val queue = Volley.newRequestQueue(requireContext())
-        var coordinates: PolylineOptions? = null
         val response = StringRequest(Request.Method.GET, url, { response ->
-            coordinates = getCoordinates(response, requireContext())
-        }, {})
-        if (coordinates != null) {
-            viewModel.mapViewState.polyline = googleMap?.addPolyline(coordinates)
-            queue.add(response)
-        } else {
-            if (!rotationScreen) {
-                showSnackLong(
-                    view,
-                    getString(R.string.route_error),
-                    context,
-                    R.color.red_600,
-                    R.color.white_50
-                )
+            val coordinates = getCoordinates(response, requireContext())
+            if (coordinates != null) {
+                viewModel.mapViewState.polyline = googleMap?.addPolyline(coordinates)
+            } else {
+                if (!rotationScreen) {
+                    showSnackLong(
+                        view,
+                        getString(R.string.route_error),
+                        context,
+                        R.color.red_600,
+                        R.color.white_50
+                    )
+                }
             }
-        }
+        }, {})
+        queue.add(response)
     }
 
     private fun askPermissions() {
@@ -211,11 +227,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun bindMapView() {
         with(viewModel) {
-            if (mapViewState.locationEnable) {
-                binding.iconLocation.setImageResource(R.drawable.ic_marker_on)
-            } else {
-                binding.iconLocation.setImageResource(R.drawable.ic_marker_off)
-            }
             mapViewState.urlPolyline?.let { url ->
                 loadURL(url, true)
             }
@@ -299,6 +310,36 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
             googleMap?.animateCamera(
                 CameraUpdateFactory.newCameraPosition(cameraPosition)
             )
+        }
+    }
+
+    private fun getLastLocation(context: Context): Location? {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            var gpsLocationTime: Long = 0
+            if (null != locationGPS) {
+                gpsLocationTime = locationGPS.time
+            }
+            var netLocationTime: Long = 0
+            if (null != locationNet) {
+                netLocationTime = locationNet.time
+            }
+            return if (0 < gpsLocationTime - netLocationTime) {
+                locationGPS
+            } else {
+                locationNet ?: locationGPS
+            }
+        } else {
+            return null
         }
     }
 

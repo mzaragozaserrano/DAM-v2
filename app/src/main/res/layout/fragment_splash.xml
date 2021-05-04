@@ -10,8 +10,8 @@
     <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/progress_circle"
         style="?android:attr/progressBarStyle"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:indeterminateTint="@color/indigo_900_dark"
         android:progress="1"
         app:layout_constraintBottom_toBottomOf="parent"

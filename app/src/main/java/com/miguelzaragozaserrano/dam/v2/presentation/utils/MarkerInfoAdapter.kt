@@ -3,6 +3,7 @@ package com.miguelzaragozaserrano.dam.v2.presentation.utils
 import android.app.Activity
 import android.content.Context
 import android.view.View
+import android.widget.Toast
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.miguelzaragozaserrano.dam.v2.data.models.Camera
@@ -16,8 +17,12 @@ class MarkerInfoAdapter(private val context: Context) : GoogleMap.InfoWindowAdap
         val layoutInflater = (context as Activity).layoutInflater
         val binding = MarkerInfoBinding.inflate(layoutInflater)
         val camera: MyCluster? = marker?.tag as MyCluster?
-        binding.markerTitle.text = camera?.title
-        binding.markerImage.bindImageViewMarker(camera?.url, marker)
+        with(binding){
+            markerTitle.text = camera?.title
+            markerImage.apply {
+                bindImageViewMarker(camera?.url, marker)
+            }
+        }
         return binding.root
     }
 
