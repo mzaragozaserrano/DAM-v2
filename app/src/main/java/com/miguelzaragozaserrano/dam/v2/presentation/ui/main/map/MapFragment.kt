@@ -102,12 +102,12 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
 
     override fun toolbarItemSelected(itemSelected: MenuItem, menu: Menu) {
         super.toolbarItemSelected(itemSelected, menu)
-        when(itemSelected.itemId) {
+        when (itemSelected.itemId) {
             R.id.location_icon -> {
-                if(viewModel.mapViewState.locationEnable) {
+                if (viewModel.mapViewState.locationEnable) {
                     menu.findItem(R.id.location_icon).icon =
                         AppCompatResources.getDrawable(requireContext(), R.drawable.ic_marker_off)
-                }else{
+                } else {
                     menu.findItem(R.id.location_icon).icon =
                         AppCompatResources.getDrawable(requireContext(), R.drawable.ic_marker_on)
                 }
@@ -118,10 +118,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
 
     override fun onBackPressedFun() {
         super.onBackPressedFun()
-        with(viewModel.mapViewState) {
-            polyline = null
-            urlPolyline = ""
-        }
         findNavController().navigate(R.id.action_map_fragment_to_cameras_fragment)
     }
 
@@ -165,13 +161,23 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
                 googleMap?.isMyLocationEnabled = true
                 viewModel.mapViewState.locationEnable = true
                 googleMap?.uiSettings?.isMyLocationButtonEnabled = true
-                getDirection()
+                showDialogMessageSimple(
+                    title = getString(R.string.route_title),
+                    message = getString(R.string.route_message),
+                    positiveText = getString(R.string.calculate_button),
+                    icon = R.drawable.ic_route,
+                    functionPositiveButton = {
+                        viewModel.mapViewState.route = true
+                        getDirection()
+                    }
+                )
             } else {
                 googleMap?.isMyLocationEnabled = false
                 viewModel.mapViewState.locationEnable = false
                 googleMap?.uiSettings?.isMyLocationButtonEnabled = false
                 viewModel.mapViewState.polyline?.remove()
                 viewModel.mapViewState.urlPolyline = null
+                viewModel.mapViewState.route = false
             }
         } else {
             askPermissions()
@@ -227,8 +233,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun bindMapView() {
         with(viewModel) {
-            mapViewState.urlPolyline?.let { url ->
-                loadURL(url, true)
+            if (mapViewState.route) {
+                mapViewState.urlPolyline?.let { url ->
+                    loadURL(url, true)
+                }
             }
             googleMap?.isMyLocationEnabled = mapViewState.locationEnable
             googleMap?.uiSettings?.isMyLocationButtonEnabled = mapViewState.locationEnable

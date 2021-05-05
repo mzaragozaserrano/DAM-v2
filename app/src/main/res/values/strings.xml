@@ -32,4 +32,7 @@
     <string name="camera_added">Cámara añadida a favoritos</string>
     <string name="camera_removed">Cámara eliminada de favoritos</string>
     <string name="route_error">No se ha podido encontrar una ruta</string>
+    <string name="route_title">Calcular ruta</string>
+    <string name="route_message">¿Deseas calcular el recorrido en coche desde tu localización hasta la cámara seleccionada?</string>
+    <string name="calculate_button">Calcular</string>
 </resources>

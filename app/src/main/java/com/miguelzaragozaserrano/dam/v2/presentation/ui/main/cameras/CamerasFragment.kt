@@ -79,6 +79,12 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
         binding.apply {
             bindAdapter(viewModel, camerasList, adapter)
         }
+        with(viewModel.mapViewState) {
+            polyline = null
+            urlPolyline = ""
+            locationEnable = false
+            route = false
+        }
     }
 
     override fun setup5InitFunctions() {

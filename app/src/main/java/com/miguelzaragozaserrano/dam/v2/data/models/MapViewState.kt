@@ -7,5 +7,6 @@ data class MapViewState(
     var urlPolyline: String? = null,
     var mapType: Int = GoogleMap.MAP_TYPE_NORMAL,
     var polyline: Polyline? = null,
-    var locationEnable: Boolean = false
+    var locationEnable: Boolean = false,
+    var route: Boolean = false
 )
