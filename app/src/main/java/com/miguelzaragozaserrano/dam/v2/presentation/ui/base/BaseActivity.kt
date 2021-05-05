@@ -21,13 +21,10 @@ abstract class BaseActivity<VB : ViewBinding> : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = getViewBinding()
         setContentView(binding.root)
-        onInject()
         setupInit()
     }
 
     abstract fun getViewBinding(): VB
-
-    open fun onInject() {}
 
     private fun setupInit() {
         setup1Toolbar()
