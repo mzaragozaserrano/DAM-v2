@@ -58,7 +58,7 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
                 swipeDirections = mutableListOf(
                     ImageTouchHelper.SwipeDirection.TOP_TO_BOTTOM
                 ),
-                functionOnLongClickListener = { goToMapFragment() },
+                functionOnGoToMapFragment = { goToMapFragment() },
                 functionOnRemoveImage = { removeCameraSelected() }
             )
         } else {
@@ -68,7 +68,7 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
                 swipeDirections = mutableListOf(
                     ImageTouchHelper.SwipeDirection.LEFT_TO_RIGHT
                 ),
-                functionOnLongClickListener = { goToMapFragment() },
+                functionOnGoToMapFragment = { goToMapFragment() },
                 functionOnRemoveImage = { removeCameraSelected() }
             )
         }

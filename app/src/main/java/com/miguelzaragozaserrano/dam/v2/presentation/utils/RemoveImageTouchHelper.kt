@@ -9,7 +9,6 @@ import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import kotlin.math.abs
 
-
 class ImageTouchHelper :
     View.OnTouchListener {
 
@@ -21,7 +20,7 @@ class ImageTouchHelper :
     private var layoutToShowHide: View? = null
     private var gestureDetector: GestureDetector? = null
     private var swipeDirections: MutableList<SwipeDirection>? = null
-    private var functionOnLongClickListener: (() -> Unit)? = null
+    private var functionOnGoToMapFragment: (() -> Unit)? = null
     private var functionOnRemoveImage: (() -> Unit)? = null
 
     @SuppressLint("ClickableViewAccessibility")
@@ -30,7 +29,7 @@ class ImageTouchHelper :
         layoutToShowHide: View?,
         swipeDirections: MutableList<SwipeDirection>,
         maxSwipeDistance: Int = 1,
-        functionOnLongClickListener: () -> Unit,
+        functionOnGoToMapFragment: () -> Unit,
         functionOnRemoveImage: () -> Unit
     ) {
         val gestureListener = GestureListener()
@@ -40,7 +39,7 @@ class ImageTouchHelper :
         this.swipeDirections = swipeDirections
         gestureListener.maxSwipeDistance = maxSwipeDistance
         this.rootLayout?.setOnTouchListener(this)
-        this.functionOnLongClickListener = functionOnLongClickListener
+        this.functionOnGoToMapFragment = functionOnGoToMapFragment
         this.functionOnRemoveImage = functionOnRemoveImage
     }
 
@@ -55,7 +54,7 @@ class ImageTouchHelper :
 
         override fun onSingleTapUp(e: MotionEvent?): Boolean {
             super.onSingleTapUp(e)
-            functionOnLongClickListener?.invoke()
+            functionOnGoToMapFragment?.invoke()
             return true
         }
 
