@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
 import com.miguelzaragozaserrano.dam.v2.R
-import com.miguelzaragozaserrano.dam.v2.data.dto.response.GoogleMapsResponse
+import com.miguelzaragozaserrano.dam.v2.data.datasource.network.dto.response.GoogleMapsResponse
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import java.time.LocalDateTime
 

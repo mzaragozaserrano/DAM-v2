@@ -1,4 +1,4 @@
-package com.miguelzaragozaserrano.dam.v2.data.dto.response
+package com.miguelzaragozaserrano.dam.v2.data.datasource.network.dto.response
 
 class GoogleMapsResponse {
     var routes:ArrayList<Routes>? = null
