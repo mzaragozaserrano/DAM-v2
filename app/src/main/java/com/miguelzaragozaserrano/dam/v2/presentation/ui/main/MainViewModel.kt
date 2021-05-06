@@ -2,12 +2,11 @@ package com.miguelzaragozaserrano.dam.v2.presentation.ui.main
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.miguelzaragozaserrano.dam.v2.data.models.*
-import com.miguelzaragozaserrano.dam.v2.db.CameraDb
-import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
-import com.miguelzaragozaserrano.dam.v2.db.repositories.CameraRepository
+import com.miguelzaragozaserrano.dam.v2.domain.models.*
+import com.miguelzaragozaserrano.dam.v2.data.db.CameraDatabase
+import com.miguelzaragozaserrano.dam.v2.data.db.entity.CameraEntity
+import com.miguelzaragozaserrano.dam.v2.domain.repositories.CameraRepository
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.downloadFile
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.UtilsDownload.numberCameras
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(context: Context) : BaseViewModel() {
 
-    private val database by lazy { CameraDb.getInstance(context) }
+    private val database by lazy { CameraDatabase.getInstance(context) }
     private val repository by lazy { CameraRepository(database.cameraDao) }
 
     var isFirstTime = true

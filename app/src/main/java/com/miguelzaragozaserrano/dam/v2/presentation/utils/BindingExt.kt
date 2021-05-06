@@ -23,8 +23,8 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.miguelzaragozaserrano.dam.v2.R
-import com.miguelzaragozaserrano.dam.v2.data.models.Camera
-import com.miguelzaragozaserrano.dam.v2.data.models.SearchViewState
+import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
+import com.miguelzaragozaserrano.dam.v2.domain.models.SearchViewState
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentCamerasBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentMapBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentSplashBinding

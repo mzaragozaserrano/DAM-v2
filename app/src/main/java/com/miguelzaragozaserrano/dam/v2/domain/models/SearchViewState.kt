@@ -1,4 +1,4 @@
-package com.miguelzaragozaserrano.dam.v2.data.models
+package com.miguelzaragozaserrano.dam.v2.domain.models
 
 data class SearchViewState(
     var query: String? = "",

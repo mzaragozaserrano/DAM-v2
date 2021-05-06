@@ -1,6 +1,6 @@
 package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
-import com.miguelzaragozaserrano.dam.v2.data.models.Camera
+import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

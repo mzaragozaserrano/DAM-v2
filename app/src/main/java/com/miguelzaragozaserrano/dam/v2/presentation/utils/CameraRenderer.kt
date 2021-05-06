@@ -9,8 +9,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.miguelzaragozaserrano.dam.v2.R
-import com.miguelzaragozaserrano.dam.v2.data.models.Camera
-import com.miguelzaragozaserrano.dam.v2.data.models.MyCluster
 
 class CameraRenderer(
     private val context: Context,

@@ -1,12 +1,11 @@
-package com.miguelzaragozaserrano.dam.v2.db.dao
+package com.miguelzaragozaserrano.dam.v2.data.db.dao
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
+import com.miguelzaragozaserrano.dam.v2.data.db.entity.CameraEntity
 
 @Dao
 interface CameraDao {

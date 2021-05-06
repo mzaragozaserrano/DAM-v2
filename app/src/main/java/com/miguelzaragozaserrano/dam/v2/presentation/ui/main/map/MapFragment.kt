@@ -28,8 +28,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.ClusterManager
 import com.miguelzaragozaserrano.dam.v2.R
-import com.miguelzaragozaserrano.dam.v2.data.models.Camera
-import com.miguelzaragozaserrano.dam.v2.data.models.MyCluster
+import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
+import com.miguelzaragozaserrano.dam.v2.presentation.utils.MyCluster
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentMapBinding
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel

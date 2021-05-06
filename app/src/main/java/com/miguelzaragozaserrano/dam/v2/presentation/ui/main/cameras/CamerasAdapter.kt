@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.miguelzaragozaserrano.dam.v2.R
-import com.miguelzaragozaserrano.dam.v2.data.models.Camera
+import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentCamerasBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*

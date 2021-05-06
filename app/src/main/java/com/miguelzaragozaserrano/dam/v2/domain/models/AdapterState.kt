@@ -1,4 +1,4 @@
-package com.miguelzaragozaserrano.dam.v2.data.models
+package com.miguelzaragozaserrano.dam.v2.domain.models
 
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.Constants

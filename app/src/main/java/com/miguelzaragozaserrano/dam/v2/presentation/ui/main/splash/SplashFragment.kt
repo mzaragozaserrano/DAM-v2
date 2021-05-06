@@ -7,7 +7,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.miguelzaragozaserrano.dam.v2.R
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentSplashBinding
-import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
+import com.miguelzaragozaserrano.dam.v2.data.db.entity.CameraEntity
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.main.MainViewModel
 import com.miguelzaragozaserrano.dam.v2.presentation.utils.*

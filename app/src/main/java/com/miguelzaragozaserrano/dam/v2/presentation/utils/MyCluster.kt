@@ -1,4 +1,4 @@
-package com.miguelzaragozaserrano.dam.v2.data.models
+package com.miguelzaragozaserrano.dam.v2.presentation.utils
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.clustering.ClusterItem

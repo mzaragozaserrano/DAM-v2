@@ -1,8 +1,8 @@
-package com.miguelzaragozaserrano.dam.v2.db.repositories
+package com.miguelzaragozaserrano.dam.v2.domain.repositories
 
 import androidx.lifecycle.LiveData
-import com.miguelzaragozaserrano.dam.v2.db.dao.CameraDao
-import com.miguelzaragozaserrano.dam.v2.db.entity.CameraEntity
+import com.miguelzaragozaserrano.dam.v2.data.db.dao.CameraDao
+import com.miguelzaragozaserrano.dam.v2.data.db.entity.CameraEntity
 
 class CameraRepository(private val cameraDao: CameraDao) {
 

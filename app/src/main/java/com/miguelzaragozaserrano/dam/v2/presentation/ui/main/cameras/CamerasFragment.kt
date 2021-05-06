@@ -9,9 +9,9 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.miguelzaragozaserrano.dam.v2.R
-import com.miguelzaragozaserrano.dam.v2.data.models.AdapterState
-import com.miguelzaragozaserrano.dam.v2.data.models.Camera
-import com.miguelzaragozaserrano.dam.v2.data.models.SearchViewState
+import com.miguelzaragozaserrano.dam.v2.domain.models.AdapterState
+import com.miguelzaragozaserrano.dam.v2.domain.models.Camera
+import com.miguelzaragozaserrano.dam.v2.domain.models.SearchViewState
 import com.miguelzaragozaserrano.dam.v2.databinding.FragmentCamerasBinding
 import com.miguelzaragozaserrano.dam.v2.databinding.ListViewItemBinding
 import com.miguelzaragozaserrano.dam.v2.presentation.ui.base.BaseFragment

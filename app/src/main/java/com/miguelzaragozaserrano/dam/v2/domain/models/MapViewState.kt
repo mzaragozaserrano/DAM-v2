@@ -1,4 +1,4 @@
-package com.miguelzaragozaserrano.dam.v2.data.models
+package com.miguelzaragozaserrano.dam.v2.domain.models
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Polyline

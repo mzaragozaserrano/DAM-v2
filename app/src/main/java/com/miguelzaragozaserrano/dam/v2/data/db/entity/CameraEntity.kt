@@ -1,4 +1,4 @@
-package com.miguelzaragozaserrano.dam.v2.db.entity
+package com.miguelzaragozaserrano.dam.v2.data.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
